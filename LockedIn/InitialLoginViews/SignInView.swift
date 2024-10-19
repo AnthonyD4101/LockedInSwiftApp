@@ -20,7 +20,14 @@ struct SignInView: View {
             VStack {
                 // Logo and Heading
                 VStack(spacing: 16) {
-                    // TODO: Add Logo
+                    Image("LockedInLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 300, maxHeight: 300)
+                        .shadow(color: Color.white.opacity(0.5), radius: 30, x: 0, y: 0)
+                        .shadow(color: Color.white.opacity(0.8), radius: 15, x: 0, y: 0)
+                    
+                    
                     Text("Welcome to LockedIn")
                         .foregroundColor(.white)
                         .font(.system(size: 24))
@@ -31,48 +38,58 @@ struct SignInView: View {
                 Spacer()
                 
                 // Sign In Credentials
-                VStack(spacing: 24) {
-                    Text("Email/Username")
-                        .foregroundColor(.white)
-                        .font(.system(size: 18))
-                        .bold()
+                VStack(spacing: 8) {
+                    VStack(alignment: .leading) {
+                        Text("Email/Username")
+                            .foregroundColor(.white)
+                            .font(.system(size: 18))
+                            .bold()
+                            .padding(.horizontal, 40)
+                        
+                        
+                        TextField("", text: $username)
+                            .padding()
+                            .background(Color(red: 32/255, green: 33/255, blue: 33/255))
+                            .cornerRadius(8)
+                            .padding(.horizontal, 40)
+                            .shadow(radius: 5)
+                            .foregroundColor(.black)
+                    }
+                    .padding(.bottom, 16)
                     
-                    TextField("Enter your email or username", text: $username)
-                        .padding()
-                        .background(Color(red: 32/255, green: 33/255, blue: 33/255))
-                        .cornerRadius(8)
-                        .padding(.horizontal, 40)
-                        .shadow(radius: 5)
-                        .foregroundColor(.black)
-                    
-                    Text("Password")
-                        .foregroundColor(.white)
-                        .font(.system(size: 18))
-                        .bold()
-                    
-                    TextField("Enter your password", text: $userPassword)
-                        .padding()
-                        .background(Color(red: 32/255, green: 33/255, blue: 33/255))
-                        .cornerRadius(8)
-                        .padding(.horizontal, 40)
-                        .shadow(radius: 5)
-                        .foregroundColor(.black)
+                    VStack(alignment: .leading) {
+                        Text("Password")
+                            .foregroundColor(.white)
+                            .font(.system(size: 18))
+                            .bold()
+                            .padding(.horizontal, 40)
+                        
+                        TextField("", text: $userPassword)
+                            .padding()
+                            .background(Color(red: 32/255, green: 33/255, blue: 33/255))
+                            .cornerRadius(8)
+                            .padding(.horizontal, 40)
+                            .shadow(radius: 5)
+                            .foregroundColor(.black)
+                    }
                     
                     Button(action: {
                         // TODO: Implement SignIn Button Funtionality
+                        print("Sign In Clicked")
                     }) {
                         Text("Sign In")
                             .font(.system(size: 24))
                             .bold()
                             .foregroundColor(.white)
                             .padding()
-                            .frame(width: 300)
+                            .frame(width: 320)
                             .background(
                                 LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
                                                startPoint: .leading, endPoint: .trailing)
                             )
-                            .cornerRadius(30)
+                            .cornerRadius(8)
                     }
+                    .padding(.top, 30)
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 40)
@@ -92,7 +109,7 @@ struct SignInView: View {
                         .bold()
                         .underline()
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 30)
             }
         }
     }
