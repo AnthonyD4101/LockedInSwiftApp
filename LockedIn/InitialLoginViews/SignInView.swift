@@ -11,7 +11,6 @@ struct SignInView: View {
     @State private var username: String = ""
     @State private var userPassword: String = ""
     
-    // TODO: Fix Styling
     var body: some View {
         ZStack {
             Color(.black)
