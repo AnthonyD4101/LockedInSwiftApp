@@ -53,7 +53,7 @@ struct SignInView: View {
                                 .cornerRadius(8)
                                 .padding(.horizontal, 40)
                                 .shadow(radius: 5)
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                         }
                         .padding(.bottom, 16)
                         
@@ -70,7 +70,7 @@ struct SignInView: View {
                                 .cornerRadius(8)
                                 .padding(.horizontal, 40)
                                 .shadow(radius: 5)
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                         }
                         
                         Button(action: {

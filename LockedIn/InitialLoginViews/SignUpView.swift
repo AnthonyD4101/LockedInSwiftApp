@@ -84,7 +84,7 @@ struct UserTextField: View {
                 .background(Color(red: 32/255, green: 33/255, blue: 33/255))
                 .cornerRadius(8)
                 .shadow(radius: 5)
-                .foregroundColor(.black)
+                .foregroundColor(.white)
         }
     }
 }
