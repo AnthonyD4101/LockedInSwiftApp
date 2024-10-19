@@ -9,7 +9,13 @@ import SwiftUI
 
 struct CalendarView: View {
     var body: some View {
-        Text("Calendar View")
+        ZStack {
+            Color(.black)
+                .edgesIgnoringSafeArea(.all)
+            
+            Text("Calendar View")
+                .foregroundColor(.white)
+        }
     }
 }
 

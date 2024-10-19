@@ -9,7 +9,13 @@ import SwiftUI
 
 struct FocusView: View {
     var body: some View {
-        Text("Focus View")
+        ZStack {
+            Color(.black)
+                .edgesIgnoringSafeArea(.all)
+            
+            Text("Focus View")
+                .foregroundColor(.white)
+        }
     }
 }
 

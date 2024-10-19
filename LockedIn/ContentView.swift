@@ -40,7 +40,7 @@ struct ContentView: View {
                         }
                 }
                 .onAppear {
-                    isSignedIn = true // Temporarily set to true for testing
+                    isSignedIn = true
                 }
             } else {
                 SignInView(isSignedIn: $isSignedIn)
