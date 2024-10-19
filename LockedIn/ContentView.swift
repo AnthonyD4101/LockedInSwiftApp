@@ -8,8 +8,44 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isSignedIn: Bool = false
+    
     var body: some View {
-        SignInView()
+        NavigationView {
+            if isSignedIn {
+                TabView {
+                    TasksView()
+                        .tabItem {
+                            Label("Tasks", systemImage: "list.bullet")
+                        }
+                    
+                    CalendarView()
+                        .tabItem {
+                            Label("Calendar", systemImage: "calendar")
+                        }
+                    
+                    FocusView()
+                        .tabItem {
+                            Label("Focus", systemImage: "clock")
+                        }
+                    
+                    CommunityView()
+                        .tabItem {
+                            Label("Community", systemImage: "person.3")
+                        }
+                    
+                    ProfileView()
+                        .tabItem {
+                            Label("Profile", systemImage: "person")
+                        }
+                }
+                .onAppear {
+                    isSignedIn = true // Temporarily set to true for testing
+                }
+            } else {
+                SignInView(isSignedIn: $isSignedIn)
+            }
+        }
     }
 }
 

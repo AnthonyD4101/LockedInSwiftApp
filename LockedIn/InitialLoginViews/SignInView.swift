@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SignInView: View {
+    @Binding var isSignedIn: Bool
     @State private var username: String = ""
     @State private var userPassword: String = ""
     
@@ -75,6 +76,7 @@ struct SignInView: View {
                         
                         Button(action: {
                             // TODO: Implement SignIn Button Funtionality
+                            isSignedIn = true
                             print("Sign In Clicked")
                         }) {
                             Text("Sign In")
@@ -120,7 +122,7 @@ struct SignInView: View {
 }
 
 #Preview {
-    SignInView()
+    SignInView(isSignedIn: .constant(false))
 }
 
 
