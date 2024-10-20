@@ -13,7 +13,7 @@ struct FocusView: View {
             Color(.black)
                 .edgesIgnoringSafeArea(.all)
             
-            Text("Focus View")
+            Text("Timer")
                 .foregroundColor(.white)
         }
     }
