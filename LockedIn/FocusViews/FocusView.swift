@@ -4,6 +4,7 @@ struct FocusView: View {
     
     @State private var isFocus = true
     @State private var focusTimer = 25
+    @State private var settedFocusTimer = 25
     @State private var breakTimer = 5
     
     @State private var isRunning = false
@@ -22,6 +23,7 @@ struct FocusView: View {
                 TimerControlsView(
                     isFocus: $isFocus,
                     focusTimer: $focusTimer,
+                    settedFocusTimer: $settedFocusTimer,
                     breakTimer: $breakTimer,
                     secondsRemaining: $secondsRemaining,
                     isRunning: $isRunning
@@ -31,9 +33,6 @@ struct FocusView: View {
             }
             .background(Color.black.edgesIgnoringSafeArea(.all))
         }
-        .onChange(of: focusTimer) { newFocusTimer in
-            breakTimer = max(newFocusTimer - 20, 5)
-        }
     }
 }
 
@@ -42,7 +41,7 @@ struct ModeButtonsView: View {
     
     var body: some View {
         HStack {
-            Text("Focus Time")
+            Text("Lock In")
                 .font(.headline)
                 .padding()
                 .background(isFocus ? Color.white : Color.black)
@@ -51,7 +50,7 @@ struct ModeButtonsView: View {
             
             Spacer().frame(width: 70)
             
-            Text("Break Mode")
+            Text("Lock Out")
                 .font(.headline)
                 .padding()
                 .background(isFocus ? Color.black : Color.white)
@@ -62,9 +61,44 @@ struct ModeButtonsView: View {
     }
 }
 
+//struct ModeButtonsView: View {
+//    @Binding var isFocus: Bool
+//    
+//    var body: some View {
+//        HStack {
+//            Button(action: {
+//                isFocus = true
+//            }) {
+//                Text("Lock In")
+//                    .font(.headline)
+//                    .padding()
+//                    .background(isFocus ? Color.white : Color.black)
+//                    .foregroundColor(isFocus ? Color.black : Color.white)
+//                    .cornerRadius(10)
+//            }
+//            
+//            Spacer().frame(width: 70)
+//            
+//            Button(action: {
+//                isFocus = false
+//            }) {
+//                Text("Lock Out")
+//                    .font(.headline)
+//                    .padding()
+//                    .background(isFocus ? Color.black : Color.white)
+//                    .foregroundColor(isFocus ? Color.white : Color.black)
+//                    .cornerRadius(10)
+//            }
+//        }
+//        .padding(.top, 40)
+//    }
+//}
+
+
 struct TimerControlsView: View {
     @Binding var isFocus: Bool
     @Binding var focusTimer: Int
+    @Binding var settedFocusTimer: Int
     @Binding var breakTimer: Int
     @Binding var secondsRemaining: Int
     @Binding var isRunning: Bool
@@ -73,16 +107,17 @@ struct TimerControlsView: View {
     
     var body: some View {
         VStack {
-            Button(action: {
-                if isFocus {
+            if isFocus {
+                Button(action: {
                     if focusTimer < 60 {
                         focusTimer += 1
+                        settedFocusTimer += 1
                     }
+                }) {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
                 }
-            }) {
-                Image(systemName: "arrow.up")
-                    .font(.system(size: 40))
-                    .foregroundColor(.white)
             }
             
             HStack(spacing: 0) {
@@ -115,16 +150,17 @@ struct TimerControlsView: View {
                 }
             }
             
-            Button(action: {
-                if isFocus {
+            if isFocus {
+                Button(action: {
                     if focusTimer > 25 {
                         focusTimer -= 1
+                        settedFocusTimer -= 1
                     }
+                }) {
+                    Image(systemName: "arrow.down")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
                 }
-            }) {
-                Image(systemName: "arrow.down")
-                    .font(.system(size: 40))
-                    .foregroundColor(.white)
             }
         }
     }
@@ -158,19 +194,24 @@ struct TimerControlsView: View {
     func resetTimer() {
         stopTimer()
         focusTimer = 25
+        settedFocusTimer = 25
         secondsRemaining = 0
     }
     
     func switchToBreakMode() {
+        breakTimer = max(settedFocusTimer - 20, 5)
         stopTimer()
         isFocus = false
         secondsRemaining = 0
     }
+
     
     func switchToFocusMode() {
+        focusTimer = settedFocusTimer
         stopTimer()
         isFocus = true
         secondsRemaining = 0
+        
     }
     
     func timerTick() {
@@ -195,6 +236,7 @@ struct TimerControlsView: View {
         }
     }
 }
+
 
 struct FocusView_Previews: PreviewProvider {
     static var previews: some View {
