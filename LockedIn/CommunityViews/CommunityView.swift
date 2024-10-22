@@ -64,10 +64,16 @@ struct CommunityView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.gray)
                             .padding(.leading, 10)
-
-                        TextField("", text: $searchText)
-                            .foregroundColor(.white)
-                            .padding(.leading, 5)
+                        
+                        ZStack {
+                            if searchText.isEmpty{
+                                Text("Search for a community").foregroundColor(Color(red: 0.44, green: 0.46, blue: 0.49))
+                            }
+                            TextField("", text: $searchText)
+                                .foregroundColor(.white)
+                                .padding(.leading, 5)
+                                .textInputAutocapitalization(.never)
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -76,29 +82,38 @@ struct CommunityView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        ForEach(filteredCommunities) { community in
-                            Button(action: {
-                                selectedCommunity = community
-                            }) {
-                                VStack(spacing: 0) {
-                                    Text(community.name)
-                                        .font(.headline)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 8)
-                                        .background(Color(red: 0.247, green: 0.239, blue: 0.239))
-                                    
-                                    Image(systemName: community.imageName)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(maxWidth: .infinity, maxHeight: 150)
-                                        .background(
-                                            LinearGradient(gradient: Gradient(colors: [Color.orange, Color.red]), startPoint: .top, endPoint: .bottom)
-                                        )
+                        if filteredCommunities.isEmpty {
+                            Text("No communities found")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .multilineTextAlignment(.center)
+                        } else {
+                            ForEach(filteredCommunities) { community in
+                                Button(action: {
+                                    selectedCommunity = community
+                                }) {
+                                    VStack(spacing: 0) {
+                                        Text(community.name)
+                                            .font(.headline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 8)
+                                            .background(Color(red: 0.247, green: 0.239, blue: 0.239))
+                                        
+                                        Image(systemName: community.imageName)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(maxWidth: .infinity, maxHeight: 150)
+                                            .background(
+                                                LinearGradient(gradient: Gradient(colors: [Color.orange, Color.red]), startPoint: .top, endPoint: .bottom)
+                                            )
+                                    }
+                                    .cornerRadius(10)
+                                    .padding(.horizontal)
                                 }
-                                .cornerRadius(10)
-                                .padding(.horizontal)
                             }
                         }
                     }
