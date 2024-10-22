@@ -10,6 +10,7 @@ struct CommunityView: View {
     @State private var selectedCommunity: Community?
     @State private var isShowingDetail = false
     @State private var showAddTaskView = false
+    @State private var searchText = ""
     
     let communities = [
         Community(name: "COSC4355", imageName: "swift"),
@@ -21,8 +22,26 @@ struct CommunityView: View {
         Community(name: "Cloud Computing", imageName: "cloud"),
         Community(name: "Cybersecurity Group", imageName: "lock.shield"),
         Community(name: "Web Developers", imageName: "globe"),
-        Community(name: "Robotics Team", imageName: "gearshape")
+        Community(name: "Robotics Team", imageName: "gearshape"),
+        Community(name: "Machine Learning Enthusiasts", imageName: "brain.circuit"),
+        Community(name: "Blockchain Developers", imageName: "bitcoinsign.circle"),
+        Community(name: "Database Administrators", imageName: "server.rack"),
+        Community(name: "Open Source Contributors", imageName: "code"),
+        Community(name: "Virtual Reality Club", imageName: "gobackward"),
+        Community(name: "Linux User Group", imageName: "terminal"),
+        Community(name: "Quantum Computing Forum", imageName: "waveform.path.ecg"),
+        Community(name: "Competitive Programming", imageName: "trophy"),
+        Community(name: "DevOps Engineers", imageName: "hammer"),
+        Community(name: "UI/UX Designers", imageName: "paintbrush.pointed")
     ]
+    
+    var filteredCommunities: [Community] {
+        if searchText.isEmpty {
+            return communities
+        } else {
+            return communities.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -36,24 +55,39 @@ struct CommunityView: View {
                     .padding(.top)
                     .foregroundColor(.white)
                 
-                Text("Catch up on anything you might have missed!")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .padding(.bottom, 20)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(Color(red: 0.12, green: 0.12, blue: 0.12))
+                        .frame(height: 45)
+                    
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                            .padding(.leading, 10)
+
+                        TextField("", text: $searchText)
+                            .foregroundColor(.white)
+                            .padding(.leading, 5)
+                    }
+                    .padding(.horizontal)
+                }
+                .frame(height: 45)
+                .padding(.horizontal)
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        ForEach(communities) { community in
+                        ForEach(filteredCommunities) { community in
                             Button(action: {
                                 selectedCommunity = community
                             }) {
                                 VStack(spacing: 0) {
                                     Text(community.name)
                                         .font(.headline)
+                                        .fontWeight(.bold)
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 8)
-                                        .background(Color.gray)
+                                        .background(Color(red: 0.247, green: 0.239, blue: 0.239))
                                     
                                     Image(systemName: community.imageName)
                                         .resizable()
@@ -101,6 +135,7 @@ struct CommunityView: View {
         }
     }
 }
+
 struct CommunityDetailView: View {
     let community: Community
     @Environment(\.dismiss) var dismiss
