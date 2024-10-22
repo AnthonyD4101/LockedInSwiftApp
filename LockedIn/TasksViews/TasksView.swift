@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct TasksView: View {
-    @State private var tasks: [String] = []
+    @State private var tasks: [Task]
     @State private var showAddTaskView = false
+    
+    // Initializer to pass sample data for preview
+    init(tasks: [Task] = []) {
+        _tasks = State(initialValue: tasks)
+    }
     
     var body: some View {
         ZStack {
@@ -31,12 +36,35 @@ struct TasksView: View {
                         .foregroundColor(.white)
                         .padding()
                 } else {
-                    List(tasks, id: \.self) { task in
-                        Text(task)
-                            .foregroundColor(.white)
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            ForEach(tasks) { task in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    // Task Title
+                                    Text(task.name)
+                                        .font(.system(size: 20, weight: .bold))
+                                        .foregroundColor(.white)
+                                    
+                                    // Task Description (optional)
+                                    if !task.description.isEmpty {
+                                        Text(task.description)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(.white.opacity(0.7))
+                                    }
+                                    
+                                    // Task Date
+                                    Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.red)
+                                    
+                                    Divider()
+                                        .background(Color.white.opacity(0.3))
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                            }
+                        }
                     }
-                    .listStyle(PlainListStyle())
-                    .padding(.horizontal, 20)
                 }
                 
                 Spacer()
@@ -68,5 +96,8 @@ struct TasksView: View {
 }
 
 #Preview {
-    TasksView()
+    TasksView(tasks: [
+        Task(name: "Sample Task", description: "This is a sample task description.", date: Date())
+    ])
 }
+

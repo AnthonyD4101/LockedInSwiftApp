@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    @Binding var tasks: [String]
+    @Binding var tasks: [Task]
     @State private var newTask: String = ""
     @State private var taskDescription: String = ""
     @State private var taskDate = Date()
@@ -136,8 +136,12 @@ struct AddTaskView: View {
                 // Create Task Button
                 Button(action: {
                     if !newTask.isEmpty {
-                        tasks.append(newTask)
+                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        tasks.append(task)
                         newTask = ""
+                        taskDescription = ""
+                        taskDate = Date()
+                        subtasks = []
                     }
                 }) {
                     Text("Create Task")
@@ -159,7 +163,7 @@ struct AddTaskView: View {
 }
 
 struct AddTaskViewPreview: View {
-    @State private var tasksPreview: [String] = []
+    @State private var tasksPreview: [Task] = []
     
     var body: some View {
         AddTaskView(tasks: $tasksPreview)
