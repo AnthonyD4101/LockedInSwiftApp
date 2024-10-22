@@ -34,9 +34,11 @@ struct TasksView: View {
                     ScrollView {
                         VStack(alignment: .leading) {
                             ForEach(tasks.indices, id: \.self) { index in
-                                TaskRowView(task: $tasks[index])
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 10)
+                                TaskRowView(task: $tasks[index], onComplete: {
+                                    removeTask(at: index)
+                                })
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
                                 
                                 Divider()
                                     .background(Color.white.opacity(0.3))
@@ -55,6 +57,10 @@ struct TasksView: View {
                 .presentationDetents([.fraction(0.8)])
         }
     }
+    
+    private func removeTask(at index: Int) {
+        tasks.remove(at: index)
+    }
 }
 
 struct TasksHeaderView: View {
@@ -71,12 +77,16 @@ struct TasksHeaderView: View {
 
 struct TaskRowView: View {
     @Binding var task: Task
+    var onComplete: () -> Void
     
     var body: some View {
         HStack(alignment: .top) {
             Button(action: {
                 withAnimation {
                     task.isCompleted.toggle()
+                    if task.isCompleted {
+                        onComplete()
+                    }
                 }
             }) {
                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -136,4 +146,3 @@ struct AddTaskButton: View {
         Task(name: "Sample Task", description: "This is a sample task description.", date: Date())
     ])
 }
-
