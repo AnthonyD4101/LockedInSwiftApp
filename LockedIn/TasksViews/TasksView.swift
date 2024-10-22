@@ -62,34 +62,7 @@ struct TasksView: View {
         }
         .sheet(isPresented: $showAddTaskView) {
             AddTaskView(tasks: $tasks)
-        }
-    }
-}
-
-// TODO: Make this separate view
-struct AddTaskView: View {
-    @Binding var tasks: [String]
-    @State private var newTask: String = ""
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                TextField("Enter your task", text: $newTask)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                
-                Button("Add Task") {
-                    if !newTask.isEmpty {
-                        tasks.append(newTask)
-                        newTask = ""
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Add Task")
-            .navigationBarItems(trailing: Button("Done") {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            })
+                .presentationDetents([.fraction(0.8)])
         }
     }
 }
