@@ -7,9 +7,11 @@
 
 import SwiftUI
 
+// MARK: - Tasks View
 struct TasksView: View {
     @State private var tasks: [Task]
     @State private var showAddTaskView = false
+    @State private var selectedTask: Task? = nil
     
     init(tasks: [Task] = []) {
         _tasks = State(initialValue: tasks)
@@ -39,6 +41,9 @@ struct TasksView: View {
                                 })
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10)
+                                .onTapGesture {
+                                    selectedTask = tasks[index]
+                                }
                                 
                                 Divider()
                                     .background(Color.white.opacity(0.3))
@@ -56,6 +61,9 @@ struct TasksView: View {
             AddTaskView(tasks: $tasks)
                 .presentationDetents([.fraction(0.8)])
         }
+        .sheet(item: $selectedTask) { task in
+            TaskDetailsView(task: task)
+        }
     }
     
     private func removeTask(at index: Int) {
@@ -63,6 +71,7 @@ struct TasksView: View {
     }
 }
 
+// MARK: - Tasks Header View
 struct TasksHeaderView: View {
     var body: some View {
         VStack(alignment: .leading) {
@@ -75,6 +84,7 @@ struct TasksHeaderView: View {
     }
 }
 
+// MARK: - Tasks Row View
 struct TaskRowView: View {
     @Binding var task: Task
     var onComplete: () -> Void
@@ -84,6 +94,7 @@ struct TaskRowView: View {
             Button(action: {
                 withAnimation {
                     task.isCompleted.toggle()
+                    // Optional: Check if all subtasks are completed
                     if task.isCompleted {
                         onComplete()
                     }
@@ -117,6 +128,7 @@ struct TaskRowView: View {
     }
 }
 
+// MARK: - Add Task Button
 struct AddTaskButton: View {
     @Binding var showAddTaskView: Bool
     
@@ -141,8 +153,9 @@ struct AddTaskButton: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     TasksView(tasks: [
-        Task(name: "Sample Task", description: "This is a sample task description.", date: Date())
+        Task(name: "Sample Task", description: "This is a sample task description.", date: Date(), subtasks: ["Subtask 1", "Subtask 2"])
     ])
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// MARK: - Content View
 struct ContentView: View {
     @State private var isSignedIn: Bool = false
     
@@ -49,6 +50,7 @@ struct ContentView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     ContentView()
 }
