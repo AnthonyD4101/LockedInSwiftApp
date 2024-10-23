@@ -1,20 +1,17 @@
 import SwiftUI
 
+// Define the Community model
 struct Community: Identifiable {
     let id = UUID()
     let name: String
     let imageName: String
     var tasks: [Task] = []
+    var isFavorite: Bool = false
 }
 
-
-struct CommunityView: View {
-    @State private var selectedCommunity: Community?
-    @State private var isShowingDetail = false
-    @State private var showAddTaskView = false
-    @State private var searchText = ""
-    
-    @State private var communities = [
+// Define a list of communities with 10 entries
+struct CommunityData {
+    static var allCommunities: [Community] = [
         Community(
             name: "Photography Enthusiasts",
             imageName: "camera",
@@ -53,7 +50,8 @@ struct CommunityView: View {
                     subtasks: ["Prepare your thoughts on time travel", "Find examples from books you've read"],
                     isCompleted: false
                 )
-            ]
+            ],
+            isFavorite: true
         ),
         Community(
             name: "Yoga & Mindfulness Group",
@@ -94,16 +92,146 @@ struct CommunityView: View {
                     isCompleted: false
                 )
             ]
+        ),
+        Community(
+            name: "Tech Innovators Meetup",
+            imageName: "desktopcomputer",
+            tasks: [
+                Task(
+                    name: "AI & Machine Learning Seminar",
+                    description: "Attend a seminar on AI & Machine Learning advances.",
+                    date: Date().addingTimeInterval(86400 * 7),
+                    subtasks: ["Register for the event", "Read about AI basics", "Prepare questions for the Q&A"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Hackathon Preparation",
+                    description: "Join the group’s next hackathon preparation session.",
+                    date: Date().addingTimeInterval(86400 * 10),
+                    subtasks: ["Form a team", "Brainstorm project ideas", "Practice coding challenges"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Travel Enthusiasts",
+            imageName: "airplane",
+            tasks: [
+                Task(
+                    name: "Explore Thailand",
+                    description: "Plan a 2-week trip to Thailand.",
+                    date: Date().addingTimeInterval(86400 * 30),
+                    subtasks: ["Research destinations", "Book flights and accommodations", "Create a travel itinerary"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Backpacking Tips",
+                    description: "Share tips on backpacking for a month in Europe.",
+                    date: Date().addingTimeInterval(86400 * 15),
+                    subtasks: ["Write a blog post", "Join discussion group", "Prepare a packing list"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Fitness Warriors",
+            imageName: "heart.fill",
+            tasks: [
+                Task(
+                    name: "Strength Training Plan",
+                    description: "Follow a 4-week strength training program.",
+                    date: Date().addingTimeInterval(86400 * 2),
+                    subtasks: ["Download workout plan", "Track your progress", "Share your results with the group"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Nutrition for Fitness",
+                    description: "Learn about nutrition plans for athletes.",
+                    date: Date().addingTimeInterval(86400 * 8),
+                    subtasks: ["Research meal plans", "Prepare a grocery list", "Discuss with your trainer"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Board Game Enthusiasts",
+            imageName: "gamecontroller",
+            tasks: [
+                Task(
+                    name: "Weekly Board Game Night",
+                    description: "Join the weekly board game night at the local café.",
+                    date: Date().addingTimeInterval(86400 * 5),
+                    subtasks: ["Sign up for the event", "Bring your favorite board game", "Meet new players"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Learn Strategy Games",
+                    description: "Learn and master strategy board games like Catan and Risk.",
+                    date: Date().addingTimeInterval(86400 * 10),
+                    subtasks: ["Read strategy guides", "Play online versions", "Practice with friends"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Cycling Adventures",
+            imageName: "bicycle",
+            tasks: [
+                Task(
+                    name: "Mountain Biking Tour",
+                    description: "Plan a weekend mountain biking tour with the group.",
+                    date: Date().addingTimeInterval(86400 * 6),
+                    subtasks: ["Choose a route", "Get your bike serviced", "Pack biking essentials"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Bike Maintenance Workshop",
+                    description: "Attend a workshop on basic bike maintenance.",
+                    date: Date().addingTimeInterval(86400 * 3),
+                    subtasks: ["Register for the workshop", "Bring your bike", "Learn bike repair techniques"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Film Buffs",
+            imageName: "film",
+            tasks: [
+                Task(
+                    name: "Watch Classic Movies",
+                    description: "Watch and discuss classic films from the 1950s and 60s.",
+                    date: Date().addingTimeInterval(86400 * 4),
+                    subtasks: ["Watch 'Casablanca'", "Watch 'Vertigo'", "Prepare for the group discussion"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Film Editing Workshop",
+                    description: "Attend a workshop on video editing for indie filmmakers.",
+                    date: Date().addingTimeInterval(86400 * 12),
+                    subtasks: ["Sign up for the workshop", "Bring your project", "Submit your edits for review"],
+                    isCompleted: false
+                )
+            ]
         )
     ]
+}
 
+
+struct CommunityView: View {
+    @State private var selectedCommunity: Community?
+    @State private var isShowingDetail = false
+    @State private var showAddTaskView = false
+    @State private var searchText = ""
+    @State private var showFavoritesOnly = false
     
+    @State private var communities = CommunityData.allCommunities
+
     var filteredCommunities: [Community] {
-        if searchText.isEmpty {
-            return communities
-        } else {
-            return communities.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        let filtered = communities.filter {
+            (searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)) &&
+            (!showFavoritesOnly || $0.isFavorite)
         }
+        return filtered
     }
     
     var body: some View {
@@ -138,6 +266,16 @@ struct CommunityView: View {
                                 .padding(.leading, 5)
                                 .textInputAutocapitalization(.never)
                         }
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showFavoritesOnly.toggle()
+                        }) {
+                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                                .foregroundColor(showFavoritesOnly ? .yellow : .gray)
+                                .padding(.trailing, 10)
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -159,13 +297,25 @@ struct CommunityView: View {
                                     selectedCommunity = community
                                 }) {
                                     VStack(spacing: 0) {
-                                        Text(community.name)
-                                            .font(.headline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 8)
-                                            .background(Color(red: 0.247, green: 0.239, blue: 0.239))
+                                        HStack {
+                                            Text(community.name)
+                                                .font(.headline)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            
+                                            Button(action: {
+                                                if let index = communities.firstIndex(where: { $0.id == community.id }) {
+                                                    communities[index].isFavorite.toggle()
+                                                }
+                                            }) {
+                                                Image(systemName: community.isFavorite ? "star.fill" : "star")
+                                                    .foregroundColor(community.isFavorite ? .yellow : .gray)
+                                            }
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 10)
+                                        .background(Color(red: 0.247, green: 0.239, blue: 0.239))
                                         
                                         Image(systemName: community.imageName)
                                             .resizable()
@@ -195,6 +345,7 @@ struct CommunityView: View {
         }
     }
 }
+
 
 
 struct CommunityDetailView: View {
@@ -282,7 +433,7 @@ struct CommunityDetailView: View {
             .sheet(isPresented: $showAddTaskView) {
                 AddCommunityTaskView(community: $community)
             }
-            .sheet(item: $selectedTask) { task in  // Show TaskDetailsView when a task is selected
+            .sheet(item: $selectedTask) { task in
                 TaskDetailsView(task: task)
             }
         }
