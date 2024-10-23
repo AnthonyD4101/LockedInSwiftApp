@@ -45,7 +45,7 @@ struct AddTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        let task = Task(name: newTask, description: taskDescription, date: taskDate)
+                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
                         tasks.append(task)
                         newTask = ""
                         taskDescription = ""
