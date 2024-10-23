@@ -4,7 +4,9 @@ struct Community: Identifiable {
     let id = UUID()
     let name: String
     let imageName: String
+    var tasks: [Task] = []
 }
+
 
 struct CommunityView: View {
     @State private var selectedCommunity: Community?
@@ -12,28 +14,89 @@ struct CommunityView: View {
     @State private var showAddTaskView = false
     @State private var searchText = ""
     
-    let communities = [
-        Community(name: "COSC4355", imageName: "swift"),
-        Community(name: "Leetcode Study Group", imageName: "brain.head.profile"),
-        Community(name: "Data Science Club", imageName: "chart.bar"),
-        Community(name: "AI Research Group", imageName: "brain"),
-        Community(name: "Mobile Devs", imageName: "iphone"),
-        Community(name: "Game Development", imageName: "gamecontroller"),
-        Community(name: "Cloud Computing", imageName: "cloud"),
-        Community(name: "Cybersecurity Group", imageName: "lock.shield"),
-        Community(name: "Web Developers", imageName: "globe"),
-        Community(name: "Robotics Team", imageName: "gearshape"),
-        Community(name: "Machine Learning Enthusiasts", imageName: "brain.circuit"),
-        Community(name: "Blockchain Developers", imageName: "bitcoinsign.circle"),
-        Community(name: "Database Administrators", imageName: "server.rack"),
-        Community(name: "Open Source Contributors", imageName: "code"),
-        Community(name: "Virtual Reality Club", imageName: "gobackward"),
-        Community(name: "Linux User Group", imageName: "terminal"),
-        Community(name: "Quantum Computing Forum", imageName: "waveform.path.ecg"),
-        Community(name: "Competitive Programming", imageName: "trophy"),
-        Community(name: "DevOps Engineers", imageName: "hammer"),
-        Community(name: "UI/UX Designers", imageName: "paintbrush.pointed")
+    @State private var communities = [
+        Community(
+            name: "Photography Enthusiasts",
+            imageName: "camera",
+            tasks: [
+                Task(
+                    name: "Portrait Photography Workshop",
+                    description: "Attend a 2-hour workshop on capturing stunning portraits.",
+                    date: Date().addingTimeInterval(86400 * 3),
+                    subtasks: ["Register for the workshop", "Bring your camera", "Submit 3 portrait photos"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Photo Editing Session",
+                    description: "Learn advanced photo editing techniques in Lightroom.",
+                    date: Date().addingTimeInterval(86400 * 5),
+                    subtasks: ["Watch Lightroom tutorial", "Edit 5 photos", "Share your edits"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Book Club: Sci-Fi Edition",
+            imageName: "book",
+            tasks: [
+                Task(
+                    name: "Read Dune",
+                    description: "Complete reading Dune by Frank Herbert.",
+                    date: Date().addingTimeInterval(86400 * 14),
+                    subtasks: ["Read Chapters 1-10", "Read Chapters 11-20", "Join discussion meeting"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Discussion on Time Travel in Sci-Fi",
+                    description: "Participate in the next book club discussion on time travel tropes in sci-fi literature.",
+                    date: Date().addingTimeInterval(86400 * 10),
+                    subtasks: ["Prepare your thoughts on time travel", "Find examples from books you've read"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Yoga & Mindfulness Group",
+            imageName: "figure.walk",
+            tasks: [
+                Task(
+                    name: "Morning Yoga Routine",
+                    description: "Follow a guided yoga routine for beginners.",
+                    date: Date().addingTimeInterval(86400),
+                    subtasks: ["Watch the tutorial", "Practice poses", "Share your experience in the group"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Meditation Challenge",
+                    description: "Complete a 7-day meditation challenge.",
+                    date: Date().addingTimeInterval(86400 * 7),
+                    subtasks: ["Meditate for 10 minutes each day", "Log your progress", "Reflect on your experience"],
+                    isCompleted: false
+                )
+            ]
+        ),
+        Community(
+            name: "Creative Writers' Circle",
+            imageName: "pencil",
+            tasks: [
+                Task(
+                    name: "Write a Short Story",
+                    description: "Write a 1000-word short story on any theme of your choice.",
+                    date: Date().addingTimeInterval(86400 * 4),
+                    subtasks: ["Choose a theme", "Write the first draft", "Revise and edit"],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "Poetry Workshop",
+                    description: "Attend the online poetry workshop and create a new poem.",
+                    date: Date().addingTimeInterval(86400 * 6),
+                    subtasks: ["Register for the workshop", "Brainstorm ideas", "Submit your poem for feedback"],
+                    isCompleted: false
+                )
+            ]
+        )
     ]
+
     
     var filteredCommunities: [Community] {
         if searchText.isEmpty {
@@ -66,8 +129,9 @@ struct CommunityView: View {
                             .padding(.leading, 10)
                         
                         ZStack {
-                            if searchText.isEmpty{
-                                Text("Search for a community").foregroundColor(Color(red: 0.44, green: 0.46, blue: 0.49))
+                            if searchText.isEmpty {
+                                Text("Search for a community")
+                                    .foregroundColor(Color(red: 0.44, green: 0.46, blue: 0.49))
                             }
                             TextField("", text: $searchText)
                                 .foregroundColor(.white)
@@ -124,43 +188,28 @@ struct CommunityView: View {
             }
             .padding()
             .fullScreenCover(item: $selectedCommunity) { community in
-                CommunityDetailView(community: community)
+                if let communityIndex = communities.firstIndex(where: { $0.id == community.id }) {
+                    CommunityDetailView(community: $communities[communityIndex])
+                }
             }
-            
-            Button(action: {
-                showAddTaskView.toggle()
-            }) {
-                Image(systemName: "plus")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
-                                               startPoint: .leading,
-                                               endPoint: .trailing))
-                    .clipShape(Circle())
-                    .shadow(radius: 5)
-            }
-            .frame(width: 60, height: 60)
-            .padding()
-            .position(x: UIScreen.main.bounds.width - 50, y: UIScreen.main.bounds.height - 200)
-        }
-        .sheet(isPresented: $showAddTaskView) {
-            AddTaskView(tasks: .constant([]))
         }
     }
 }
 
+
 struct CommunityDetailView: View {
-    let community: Community
+    @Binding var community: Community
     @Environment(\.dismiss) var dismiss
+    
+    @State private var showAddTaskView = false
+    @State private var selectedTask: Task?
     
     var body: some View {
         ZStack {
             Color.black
                 .edgesIgnoringSafeArea(.all)
             
-            VStack {
+            VStack(spacing: 16) {
                 HStack {
                     Button(action: {
                         dismiss()
@@ -168,27 +217,168 @@ struct CommunityDetailView: View {
                         Text("Back")
                             .font(.headline)
                             .foregroundColor(.white)
-                            .padding()
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 20)
                             .background(Color.black)
                             .cornerRadius(10)
                     }
                     Spacer()
                 }
-                .padding(.top, -10)
-                .padding(.leading)
+                
+                HStack {
+                    Text(community.name)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.leading)
+                    
+                    Spacer()
+                }
+                
+                Divider()
+                    .background(Color.white)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        if community.tasks.isEmpty {
+                            Text("No tasks available")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            ForEach($community.tasks) { $task in
+                                Button(action: {
+                                    selectedTask = task  // Set the selected task
+                                }) {
+                                    TaskRowView(task: $task, onComplete: {})
+                                        .padding(.horizontal)
+                                        .cornerRadius(10)
+                                }
+                            }
+                        }
+                    }
+                }
                 
                 Spacer()
                 
-                Text("Details for \(community.name)")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .padding()
-                
-                Spacer()
+                Button(action: {
+                    showAddTaskView.toggle()
+                }) {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                   startPoint: .leading,
+                                                   endPoint: .trailing))
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
+                }
+                .frame(width: 60, height: 60)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .sheet(isPresented: $showAddTaskView) {
+                AddCommunityTaskView(community: $community)
+            }
+            .sheet(item: $selectedTask) { task in  // Show TaskDetailsView when a task is selected
+                TaskDetailsView(task: task)
             }
         }
     }
 }
+
+
+
+struct AddCommunityTaskView: View {
+    @Binding var community : Community
+    @State private var newTask: String = ""
+    @State private var taskDescription: String = ""
+    @State private var taskDate = Date()
+    @State private var subtasks: [String] = []
+    @State private var completedSubtasks: Int = 0
+    
+    @State private var showSuccessMessage: Bool = false
+    @State private var messageOpacity: Double = 0.0
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                TaskNameInput(taskName: $newTask)
+                TaskDescriptionInput(taskDescription: $taskDescription)
+                TaskDatePicker(taskDate: $taskDate)
+                
+                Divider()
+                    .background(Color.white)
+                    .padding(.horizontal)
+                
+                SubtasksView(subtasks: $subtasks, completedSubtasks: $completedSubtasks)
+                
+                if showSuccessMessage {
+                    Text("Task created successfully!")
+                        .font(.headline)
+                        .foregroundColor(.green)
+                        .opacity(messageOpacity)
+                        .padding(.horizontal)
+                        .animation(.easeInOut(duration: 0.5), value: messageOpacity)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    if !newTask.isEmpty {
+                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        community.tasks.append(task)
+                        newTask = ""
+                        taskDescription = ""
+                        taskDate = Date()
+                        subtasks = []
+                        showSuccessMessage = true
+                        messageOpacity = 1.0
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation {
+                                messageOpacity = 0.0
+                            }
+                        }
+                    }
+                }) {
+                    Text("Create Task")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.black)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red)
+                        .cornerRadius(25)
+                        .padding(.horizontal)
+                }
+            }
+            .padding(.top)
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .navigationTitle("Add Task")
+            .navigationBarTitleDisplayMode(.inline)
+            .onDisappear {
+                newTask = ""
+                taskDescription = ""
+                taskDate = Date()
+                subtasks = []
+                messageOpacity = 0.0
+            }
+        }
+    }
+}
+
+
+
+let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    return formatter
+}()
+
+
+
+
 
 #Preview {
     CommunityView()
