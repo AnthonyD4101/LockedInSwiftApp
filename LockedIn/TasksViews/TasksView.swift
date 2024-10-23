@@ -94,7 +94,6 @@ struct TaskRowView: View {
             Button(action: {
                 withAnimation {
                     task.isCompleted.toggle()
-                    // Optional: Check if all subtasks are completed
                     if task.isCompleted {
                         onComplete()
                     }

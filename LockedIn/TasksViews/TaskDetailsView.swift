@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+// TODO: Add "Complete Task" Functionality
+// If a user checks off all subtasks, a "Complete Task" button shows up
+// A user should be able to click this button, which in return will remove
+// said task from the task list
+
 // MARK: - Task Details View
 struct TaskDetailsView: View {
     let task: Task
