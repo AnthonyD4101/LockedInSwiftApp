@@ -45,7 +45,20 @@ struct AddTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy-MM-dd"
+                        let dueDateString = dateFormatter.string(from: taskDate)
+                        
+                        // Create a new Task instance
+                        let task = Task(
+                            id: nil,
+                            userId: 1, // TODO: update to appropiate userId
+                            title: newTask,
+                            description: taskDescription.isEmpty ? nil : taskDescription,
+                            dueDate: dueDateString,
+                            isCompleted: false
+                        )
+                        
                         tasks.append(task)
                         newTask = ""
                         taskDescription = ""

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DB3D310B2CC95DAC007E115C /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = DB3D310A2CC95DAC007E115C /* GRDB */; };
+		DB3D310D2CC95DC9007E115C /* GRDBSQLite in Frameworks */ = {isa = PBXBuildFile; productRef = DB3D310C2CC95DC9007E115C /* GRDBSQLite */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DB8B4C022CA7A9BD00D48852 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DB3D301E2CC95A0B007E115C /* GRDB.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GRDB.xcodeproj; sourceTree = "<group>"; };
 		DB8B4BF12CA7A9BA00D48852 /* LockedIn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LockedIn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB8B4C012CA7A9BD00D48852 /* LockedInTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LockedInTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB8B4C0B2CA7A9BD00D48852 /* LockedInUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LockedInUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB3D310B2CC95DAC007E115C /* GRDB in Frameworks */,
+				DB3D310D2CC95DC9007E115C /* GRDBSQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +80,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DB3D2F2B2CC955AE007E115C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DB3D30212CC95A0B007E115C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		DB8B4BE82CA7A9BA00D48852 = {
 			isa = PBXGroup;
 			children = (
 				DB8B4BF32CA7A9BA00D48852 /* LockedIn */,
 				DB8B4C042CA7A9BD00D48852 /* LockedInTests */,
 				DB8B4C0E2CA7A9BD00D48852 /* LockedInUITests */,
+				DB3D2F2B2CC955AE007E115C /* Frameworks */,
 				DB8B4BF22CA7A9BA00D48852 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +135,8 @@
 			);
 			name = LockedIn;
 			packageProductDependencies = (
+				DB3D310A2CC95DAC007E115C /* GRDB */,
+				DB3D310C2CC95DC9007E115C /* GRDBSQLite */,
 			);
 			productName = LockedIn;
 			productReference = DB8B4BF12CA7A9BA00D48852 /* LockedIn.app */;
@@ -195,9 +220,18 @@
 			);
 			mainGroup = DB8B4BE82CA7A9BA00D48852;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DB3D31092CC95DAC007E115C /* XCRemoteSwiftPackageReference "GRDB" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DB8B4BF22CA7A9BA00D48852 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DB3D30212CC95A0B007E115C /* Products */;
+					ProjectRef = DB3D301E2CC95A0B007E115C /* GRDB.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				DB8B4BF02CA7A9BA00D48852 /* LockedIn */,
@@ -552,6 +586,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DB3D31092CC95DAC007E115C /* XCRemoteSwiftPackageReference "GRDB" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DB3D310A2CC95DAC007E115C /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB3D31092CC95DAC007E115C /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		DB3D310C2CC95DC9007E115C /* GRDBSQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB3D31092CC95DAC007E115C /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDBSQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DB8B4BE92CA7A9BA00D48852 /* Project object */;
 }

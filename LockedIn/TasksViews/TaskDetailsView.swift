@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GRDB
 
 // TODO: Add "Complete Task" Functionality
 // If a user checks off all subtasks, a "Complete Task" button shows up
@@ -14,36 +15,35 @@ import SwiftUI
 
 // MARK: - Task Details View
 struct TaskDetailsView: View {
-    let task: Task
+    @State var task: Task
+    @State private var subtasks: [Subtask] = []
     @State private var completedSubtasks: Int = 0
-    @State private var subtasks: [Subtask]
-    
-    init(task: Task) {
-        self.task = task
-        self._subtasks = State(initialValue: task.subtasks.map { Subtask(name: $0, isCompleted: false) })
-    }
     
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 16) {
-                TaskNameView(name: task.name)
-                TaskDescriptionView(description: task.description)
-                TaskDueDateView(date: task.date)
+                TaskNameView(name: task.title)
+                
+                if let description = task.description, !description.isEmpty {
+                    TaskDescriptionView(description: description)
+                } else {
+                    TaskDescriptionView(description: "No description provided")
+                }
+                
+                if let date = parseDate(from: task.dueDate) {
+                    TaskDueDateView(date: date)
+                } else {
+                    Text("Invalid Due Date")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.red)
+                        .padding(.horizontal)
+                }
                 
                 Divider()
                     .background(Color.white)
                     .padding(.horizontal)
                 
                 SubtasksListView(subtasks: $subtasks, completedSubtasks: $completedSubtasks)
-                
-                if completedSubtasks == subtasks.count && subtasks.count > 0 {
-                    HStack {
-                        Spacer()
-                        CompleteTaskButton()
-                        Spacer()
-                    }
-                    .padding(.vertical, 10)
-                }
                 
                 Spacer()
             }
@@ -52,8 +52,37 @@ struct TaskDetailsView: View {
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .onAppear {
+            loadSubtasks(for: task.id)
+        }
+        .onChange(of: subtasks) {
+            completedSubtasks = subtasks.filter { $0.isCompleted }.count
+        }
+    }
+    
+    // Function to load subtasks from the database
+    private func loadSubtasks(for taskId: Int64?) {
+        guard let taskId = taskId else { return }
+        
+        do {
+            try DatabaseManager.shared.dbQueue?.read { db in
+                let fetchedSubtasks = try Subtask.filter(Column("taskId") == taskId).fetchAll(db)
+                print("Fetched subtasks for taskId \(taskId): \(fetchedSubtasks)")
+                subtasks = fetchedSubtasks
+                completedSubtasks = fetchedSubtasks.filter { $0.isCompleted }.count
+            }
+        } catch {
+            print("Error fetching subtasks: \(error)")
+        }
+    }
+    
+    private func parseDate(from dateString: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.date(from: dateString)
     }
 }
+
 
 // MARK: - Task Name View
 struct TaskNameView: View {
@@ -115,17 +144,19 @@ struct SubtasksListView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal)
             
-            ForEach($subtasks) { $subtask in
+            ForEach(subtasks) { subtask in
                 HStack {
                     Button(action: {
-                        subtask.isCompleted.toggle()
-                        completedSubtasks = subtasks.filter { $0.isCompleted }.count
+                        if let index = subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                            subtasks[index].isCompleted.toggle()
+                            completedSubtasks = subtasks.filter { $0.isCompleted }.count
+                        }
                     }) {
                         Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(.white)
                     }
                     
-                    Text(subtask.name)
+                    Text(subtask.title)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                     
@@ -152,5 +183,12 @@ struct CompleteTaskButton: View {
 
 // MARK: - Preview
 #Preview {
-    TaskDetailsView(task: Task(name: "Sample Task", description: "This is a sample task.", date: Date(), subtasks: ["Subtask 1", "Subtask 2"]))
+    TaskDetailsView(task: Task(
+        id: 1,
+        userId: 1,
+        title: "Sample Task",
+        description: "This is a sample task.",
+        dueDate: "2024-12-31",
+        isCompleted: false
+    ))
 }

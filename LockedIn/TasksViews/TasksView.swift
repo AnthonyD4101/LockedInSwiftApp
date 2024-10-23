@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GRDB
 
 // MARK: - Tasks View
 struct TasksView: View {
@@ -64,10 +65,43 @@ struct TasksView: View {
         .sheet(item: $selectedTask) { task in
             TaskDetailsView(task: task)
         }
+        .onAppear {
+            fetchTasks()
+        }
+    }
+    
+    // MARK: DB Operations
+    private func fetchTasks() {
+        do {
+            try DatabaseManager.shared.dbQueue?.read { db in
+                tasks = try Task.fetchAll(db)
+            }
+        } catch {
+            print("Failed to fetch tasks: \(error)")
+        }
+    }
+    
+    private func addTask(_ task: Task) {
+        do {
+            try DatabaseManager.shared.dbQueue?.write { db in
+                try task.insert(db)
+            }
+            fetchTasks()
+        } catch {
+            print("Failed to add task: \(error)")
+        }
     }
     
     private func removeTask(at index: Int) {
-        tasks.remove(at: index)
+        let taskToRemove = tasks[index]
+        do {
+            _ = try DatabaseManager.shared.dbQueue?.write { db in
+                try taskToRemove.delete(db)
+            }
+            tasks.remove(at: index)
+        } catch {
+            print("Failed to remove task: \(error)")
+        }
     }
 }
 
@@ -94,6 +128,7 @@ struct TaskRowView: View {
             Button(action: {
                 withAnimation {
                     task.isCompleted.toggle()
+                    updateTaskCompletionStatus(task)
                     if task.isCompleted {
                         onComplete()
                     }
@@ -105,17 +140,17 @@ struct TaskRowView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text(task.name)
+                Text(task.title)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
                 
-                if !task.description.isEmpty {
-                    Text(task.description)
+                if let description = task.description, !description.isEmpty {
+                    Text(description)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 
-                Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
+                Text("Due Date: \(task.dueDate)")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.red)
             }
@@ -124,6 +159,16 @@ struct TaskRowView: View {
         }
         .background(task.isCompleted ? Color.black.opacity(0.3) : Color.clear)
         .cornerRadius(10)
+    }
+    
+    private func updateTaskCompletionStatus(_ task: Task) {
+        do {
+            try DatabaseManager.shared.dbQueue?.write { db in
+                try task.update(db)
+            }
+        } catch {
+            print("Failed to update task completion status: \(error)")
+        }
     }
 }
 
@@ -155,6 +200,6 @@ struct AddTaskButton: View {
 // MARK: - Preview
 #Preview {
     TasksView(tasks: [
-        Task(name: "Sample Task", description: "This is a sample task description.", date: Date(), subtasks: ["Subtask 1", "Subtask 2"])
+        Task(id: 1, userId: 1, title: "Sample Task", description: "This is a sample task description.", dueDate: "2024-10-24", isCompleted: false)
     ])
 }
