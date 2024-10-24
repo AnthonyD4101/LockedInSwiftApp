@@ -14,12 +14,12 @@ import SwiftUI
 
 // MARK: - Task Details View
 struct TaskDetailsView: View {
-    let task: Task
+    @Binding var task: Task
     @State private var subtasks: [Subtask]
     
-    init(task: Task) {
-        self.task = task
-        self._subtasks = State(initialValue: task.subtasks)
+    init(task: Binding<Task>) {
+        self._task = task
+        self._subtasks = State(initialValue: task.wrappedValue.subtasks)
     }
     
     var body: some View {
@@ -39,7 +39,6 @@ struct TaskDetailsView: View {
                     HStack {
                         Spacer()
                         CompleteTaskButton {
-                            //TODO: Complete task completed logic
                             print("Task completed!")
                         }
                         Spacer()
@@ -53,6 +52,9 @@ struct TaskDetailsView: View {
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
+            .onDisappear {
+                task.subtasks = subtasks
+            }
         }
     }
 }
@@ -139,11 +141,11 @@ struct SubtasksListView: View {
 
 // MARK: - Complete Task Button
 struct CompleteTaskButton: View {
-    let action: () -> Void // Action closure for the button
+    let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            Text("Complete Task")
+            Text("All Subtasks Completed!")
                 .font(.system(size: 18, weight: .bold))
                 .padding(.vertical, 8)
                 .padding(.horizontal, 20)
@@ -155,6 +157,14 @@ struct CompleteTaskButton: View {
 }
 
 // MARK: - Preview
-#Preview {
-    TaskDetailsView(task: Task(name: "Sample Task", description: "This is a sample task.", date: Date(), subtasks: [Subtask(name: "Subtask 1", isCompleted: false), Subtask(name: "Subtask 2", isCompleted: false)]))
+struct TaskDetailsView_Preview: PreviewProvider {
+    @State static var task = Task(name: "Sample Task",
+                                  description: "This is a sample task.",
+                                  date: Date(),
+                                  subtasks: [Subtask(name: "Subtask 1", isCompleted: false),
+                                             Subtask(name: "Subtask 2", isCompleted: false)])
+    
+    static var previews: some View {
+        TaskDetailsView(task: $task)
+    }
 }
