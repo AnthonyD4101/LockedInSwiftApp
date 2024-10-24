@@ -16,7 +16,7 @@ struct ContentView: View {
         NavigationView {
             if isSignedIn {
                 TabView {
-                    TasksView(tasks: taskViewModel.tasks)
+                    TasksView(taskViewModel: taskViewModel)
                         .tabItem {
                             Label("Tasks", systemImage: "list.bullet")
                         }

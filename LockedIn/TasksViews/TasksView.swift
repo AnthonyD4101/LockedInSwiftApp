@@ -9,13 +9,9 @@ import SwiftUI
 
 // MARK: - Tasks View
 struct TasksView: View {
-    @State private var tasks: [Task]
+    @ObservedObject var taskViewModel: TaskViewModel
     @State private var showAddTaskView = false
     @State private var selectedTask: Task? = nil
-    
-    init(tasks: [Task] = []) {
-        _tasks = State(initialValue: tasks)
-    }
     
     var body: some View {
         ZStack {
@@ -28,7 +24,7 @@ struct TasksView: View {
                 Divider()
                     .background(Color.white)
                 
-                let dailyTasks = tasks.filter { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+                let dailyTasks = taskViewModel.tasksFor(date: Date())
                 
                 if dailyTasks.isEmpty {
                     Text("No tasks today")
@@ -38,8 +34,8 @@ struct TasksView: View {
                     ScrollView {
                         VStack(alignment: .leading) {
                             ForEach(dailyTasks.indices, id: \.self) { index in
-                                TaskRowView(task: $tasks[tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!], onComplete: {
-                                    removeTask(at: tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!)
+                                TaskRowView(task: $taskViewModel.tasks[taskViewModel.tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!], onComplete: {
+                                    removeTask(at: taskViewModel.tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!)
                                 })
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10)
@@ -60,7 +56,7 @@ struct TasksView: View {
             AddTaskButton(showAddTaskView: $showAddTaskView)
         }
         .sheet(isPresented: $showAddTaskView) {
-            AddTaskView(tasks: $tasks)
+            AddTaskView(taskViewModel: taskViewModel)
                 .presentationDetents([.fraction(0.8)])
         }
         .sheet(item: $selectedTask) { task in
@@ -69,7 +65,7 @@ struct TasksView: View {
     }
     
     private func removeTask(at index: Int) {
-        tasks.remove(at: index)
+        taskViewModel.removeTask(at: index)
     }
 }
 
@@ -156,7 +152,5 @@ struct AddTaskButton: View {
 
 // MARK: - Preview
 #Preview {
-    TasksView(tasks: [
-        Task(name: "Sample Task", description: "This is a sample task description.", date: Date(), subtasks: ["Subtask 1", "Subtask 2"])
-    ])
+    TasksView(taskViewModel: TaskViewModel())
 }

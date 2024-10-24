@@ -7,6 +7,7 @@ struct Community: Identifiable {
 }
 
 struct CommunityView: View {
+    @ObservedObject var taskViewModel = TaskViewModel()
     @State private var selectedCommunity: Community?
     @State private var isShowingDetail = false
     @State private var showAddTaskView = false
@@ -146,7 +147,7 @@ struct CommunityView: View {
             .position(x: UIScreen.main.bounds.width - 50, y: UIScreen.main.bounds.height - 200)
         }
         .sheet(isPresented: $showAddTaskView) {
-            AddTaskView(tasks: .constant([]))
+            AddTaskView(taskViewModel: taskViewModel)
         }
     }
 }
