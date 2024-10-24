@@ -28,21 +28,23 @@ struct TasksView: View {
                 Divider()
                     .background(Color.white)
                 
-                if tasks.isEmpty {
+                let dailyTasks = tasks.filter { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+                
+                if dailyTasks.isEmpty {
                     Text("No tasks today")
                         .foregroundColor(.white)
                         .padding()
                 } else {
                     ScrollView {
                         VStack(alignment: .leading) {
-                            ForEach(tasks.indices, id: \.self) { index in
-                                TaskRowView(task: $tasks[index], onComplete: {
-                                    removeTask(at: index)
+                            ForEach(dailyTasks.indices, id: \.self) { index in
+                                TaskRowView(task: $tasks[tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!], onComplete: {
+                                    removeTask(at: tasks.firstIndex(where: { $0.id == dailyTasks[index].id })!)
                                 })
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10)
                                 .onTapGesture {
-                                    selectedTask = tasks[index]
+                                    selectedTask = dailyTasks[index]
                                 }
                                 
                                 Divider()
