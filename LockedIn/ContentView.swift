@@ -31,7 +31,7 @@ struct ContentView: View {
                             Label("Focus", systemImage: "clock")
                         }
                     
-                    CommunityView()
+                    CommunityView(taskViewModel: taskViewModel)
                         .tabItem {
                             Label("Community", systemImage: "person.3")
                         }

@@ -26,14 +26,22 @@ struct CommunityData {
                     name: "Beta App",
                     description: "Views for Beta App",
                     date: Date().addingTimeInterval(86400 * 3),
-                    subtasks: ["Community View", "Focus View", "Task View"],
+                    subtasks: [
+                        Subtask(name: "Community View"),
+                        Subtask(name: "Focus View"),
+                        Subtask(name: "Task View")
+                    ],
                     isCompleted: false
                 ),
                 Task(
                     name: "App Specification 2",
                     description: "Fix App Specification to get points back",
                     date: Date().addingTimeInterval(86400 * 5),
-                    subtasks: ["Fix Mock UP", "Fix UserFlow", "Write Feedback Response"],
+                    subtasks: [
+                        Subtask(name: "Fix Mock UP"),
+                        Subtask(name: "Fix UserFlow"),
+                        Subtask(name: "Write Feedback Response")
+                    ],
                     isCompleted: false
                 )
             ],
@@ -51,8 +59,8 @@ struct CommunityData {
     ]
 }
 
-
 struct CommunityView: View {
+    @ObservedObject var taskViewModel: TaskViewModel
     @State private var selectedCommunity: Community?
     @State private var isShowingDetail = false
     @State private var showAddTaskView = false
@@ -197,7 +205,7 @@ struct CommunityView: View {
             .padding()
             .fullScreenCover(item: $selectedCommunity) { community in
                 if let communityIndex = communities.firstIndex(where: { $0.id == community.id }) {
-                    CommunityDetailView(community: $communities[communityIndex])
+                    CommunityDetailView(community: $communities[communityIndex], taskViewModel: taskViewModel)
                 }
             }
         }
@@ -270,6 +278,8 @@ struct CommunityDetailView: View {
     @State private var selectedTask: Task?
     @State private var selectedTab = 0
     
+    @ObservedObject var taskViewModel: TaskViewModel
+    
     var body: some View {
         ZStack {
             Color.black
@@ -303,7 +313,7 @@ struct CommunityDetailView: View {
                 Divider()
                     .background(Color.white)
                 
-
+                
                 HStack {
                     if selectedTab > 0 {
                         HStack {
@@ -453,8 +463,10 @@ struct CommunityDetailView: View {
             .sheet(isPresented: $showAddDescriptionView) {
                 AddCommunityDescriptionView(community: $community)
             }
-            .sheet(item: $selectedTask) { task in
-                TaskDetailsView(task: task)
+            .sheet(item: $selectedTask) { selectedTask in
+                if let index = taskViewModel.tasks.firstIndex(where: { $0.id == selectedTask.id }) {
+                    TaskDetailsView(task: $taskViewModel.tasks[index])
+                }
             }
         }
     }
@@ -531,8 +543,8 @@ struct AddCommunityTaskView: View {
     @State private var newTask: String = ""
     @State private var taskDescription: String = ""
     @State private var taskDate = Date()
-    @State private var subtasks: [String] = []
-    @State private var completedSubtasks: Int = 0
+    @State private var subtasks: [Subtask] = []
+    @State private var newSubtask: String = ""
     
     @State private var showSuccessMessage: Bool = false
     @State private var messageOpacity: Double = 0.0
@@ -548,7 +560,7 @@ struct AddCommunityTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksView(subtasks: $subtasks, completedSubtasks: $completedSubtasks)
+                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -616,5 +628,5 @@ let dateFormatter: DateFormatter = {
 
 
 #Preview {
-    CommunityView()
+    CommunityView(taskViewModel: TaskViewModel())
 }
