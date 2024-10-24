@@ -32,3 +32,22 @@ struct Subtask: Identifiable {
     let name: String
     var isCompleted: Bool = false
 }
+
+// MARK: - Resource Model
+struct Resource: Identifiable {
+    let id = UUID()
+    var title: String
+    var url: String
+}
+
+// MARK: - Community Model
+struct Community: Identifiable {
+    let id = UUID()
+    let name: String
+    let imageName: String
+    var tasks: [Task] = []
+    var resources: [Resource]
+    var isFavorite: Bool = false
+    var description: [String: String] = [:]
+}
+
