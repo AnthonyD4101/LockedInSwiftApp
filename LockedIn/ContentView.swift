@@ -9,18 +9,19 @@ import SwiftUI
 
 // MARK: - Content View
 struct ContentView: View {
+    @StateObject var taskViewModel = TaskViewModel()
     @State private var isSignedIn: Bool = false
     
     var body: some View {
         NavigationView {
             if isSignedIn {
                 TabView {
-                    TasksView()
+                    TasksView(tasks: taskViewModel.tasks)
                         .tabItem {
                             Label("Tasks", systemImage: "list.bullet")
                         }
                     
-                    CalendarView()
+                    CalendarView(taskViewModel: taskViewModel)
                         .tabItem {
                             Label("Calendar", systemImage: "calendar")
                         }
