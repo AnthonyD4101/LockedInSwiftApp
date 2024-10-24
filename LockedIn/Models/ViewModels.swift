@@ -32,6 +32,23 @@ class UserViewModel: ObservableObject {
         return false
     }
     
+    func updateEmail(newEmail: String) {
+        currentUser?.email = newEmail
+    }
+    
+    func updateUsername(newUsername: String) {
+        currentUser?.username = newUsername
+    }
+    
+    func updatePassword(currentPassword: String, newPassword: String) -> Bool {
+        guard currentUser?.password == currentPassword else {
+            return false
+        }
+        
+        currentUser?.password = newPassword
+        return true
+    }
+    
     func logOut() {
         currentUser = nil
     }
