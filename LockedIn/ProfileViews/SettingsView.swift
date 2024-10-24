@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    
     @State private var newEmail: String = ""
     @State private var newUsername: String = ""
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
     @State private var showPasswordChangeAlert: Bool = false
-
+    @State private var showInfoChangeAlert: Bool = false
+    @State private var passwordChangeSuccess: Bool = false
+    
     var body: some View {
         ZStack {
             Color(.black)
@@ -62,8 +66,9 @@ struct SettingsView: View {
                     
                     // Save Changes Button
                     Button(action: {
-                        // TODO: Implement email and username change functionality
-                        print("Email or username change attempted")
+                        userViewModel.updateEmail(newEmail: newEmail)
+                        userViewModel.updateUsername(newUsername: newUsername)
+                        showInfoChangeAlert = true
                     }) {
                         Text("Save Changes")
                             .font(.system(size: 18))
@@ -79,6 +84,9 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 40)
                     .padding(.top, 10)
+                    .alert(isPresented: $showInfoChangeAlert) {
+                        Alert(title: Text("Changes Saved"), message: Text("Your email and username have been updated successfully."), dismissButton: .default(Text("OK")))
+                    }
                 }
                 
                 Divider()
@@ -118,7 +126,7 @@ struct SettingsView: View {
                     // Change Password Button
                     Button(action: {
                         if newPassword == confirmPassword {
-                            // TODO: Implement password change functionality
+                            passwordChangeSuccess = userViewModel.updatePassword(currentPassword: currentPassword, newPassword: newPassword)
                             print("Password change attempted")
                         } else {
                             showPasswordChangeAlert = true
@@ -141,6 +149,9 @@ struct SettingsView: View {
                     .alert(isPresented: $showPasswordChangeAlert) {
                         Alert(title: Text("Password Mismatch"), message: Text("New password and confirmation do not match."), dismissButton: .default(Text("OK")))
                     }
+                    .alert(isPresented: $passwordChangeSuccess) {
+                        Alert(title: Text("Password Change Success"), message: Text("Your password has been successfully changed."), dismissButton: .default(Text("OK")))
+                    }
                 }
                 
                 Spacer()
@@ -153,6 +164,9 @@ struct SettingsView: View {
 // MARK: - Preview
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
+        let userViewModel = UserViewModel()
+        
         SettingsView()
+            .environmentObject(userViewModel)
     }
 }
