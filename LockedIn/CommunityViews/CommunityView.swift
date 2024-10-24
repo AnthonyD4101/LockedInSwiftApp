@@ -1,218 +1,53 @@
 import SwiftUI
 
-// Define the Community model
+struct Resource: Identifiable {
+    let id = UUID()
+    var title: String
+    var url: String
+}
 struct Community: Identifiable {
     let id = UUID()
     let name: String
     let imageName: String
     var tasks: [Task] = []
+    var resources: [Resource]
     var isFavorite: Bool = false
+    var description: [String: String] = [:]
 }
 
-// Define a list of communities with 10 entries
+
 struct CommunityData {
     static var allCommunities: [Community] = [
         Community(
-            name: "Photography Enthusiasts",
-            imageName: "camera",
+            name: "COSC4355",
+            imageName: "swift",
             tasks: [
                 Task(
-                    name: "Portrait Photography Workshop",
-                    description: "Attend a 2-hour workshop on capturing stunning portraits.",
+                    name: "Beta App",
+                    description: "Views for Beta App",
                     date: Date().addingTimeInterval(86400 * 3),
-                    subtasks: ["Register for the workshop", "Bring your camera", "Submit 3 portrait photos"],
+                    subtasks: ["Community View", "Focus View", "Task View"],
                     isCompleted: false
                 ),
                 Task(
-                    name: "Photo Editing Session",
-                    description: "Learn advanced photo editing techniques in Lightroom.",
+                    name: "App Specification 2",
+                    description: "Fix App Specification to get points back",
                     date: Date().addingTimeInterval(86400 * 5),
-                    subtasks: ["Watch Lightroom tutorial", "Edit 5 photos", "Share your edits"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Book Club: Sci-Fi Edition",
-            imageName: "book",
-            tasks: [
-                Task(
-                    name: "Read Dune",
-                    description: "Complete reading Dune by Frank Herbert.",
-                    date: Date().addingTimeInterval(86400 * 14),
-                    subtasks: ["Read Chapters 1-10", "Read Chapters 11-20", "Join discussion meeting"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Discussion on Time Travel in Sci-Fi",
-                    description: "Participate in the next book club discussion on time travel tropes in sci-fi literature.",
-                    date: Date().addingTimeInterval(86400 * 10),
-                    subtasks: ["Prepare your thoughts on time travel", "Find examples from books you've read"],
+                    subtasks: ["Fix Mock UP", "Fix UserFlow", "Write Feedback Response"],
                     isCompleted: false
                 )
             ],
-            isFavorite: true
-        ),
-        Community(
-            name: "Yoga & Mindfulness Group",
-            imageName: "figure.walk",
-            tasks: [
-                Task(
-                    name: "Morning Yoga Routine",
-                    description: "Follow a guided yoga routine for beginners.",
-                    date: Date().addingTimeInterval(86400),
-                    subtasks: ["Watch the tutorial", "Practice poses", "Share your experience in the group"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Meditation Challenge",
-                    description: "Complete a 7-day meditation challenge.",
-                    date: Date().addingTimeInterval(86400 * 7),
-                    subtasks: ["Meditate for 10 minutes each day", "Log your progress", "Reflect on your experience"],
-                    isCompleted: false
-                )
+            resources: [
+                Resource(title: "Official Swift Documentation", url: "https://swift.org/documentation/"),
+                Resource(title: "Swift by Sundell", url: "https://www.swiftbysundell.com/")
+            ],
+            description: [
+                "Group Description": "COSC4355 is a student group dedicated to mastering the art of ubiquitous programming, focusing on designing and developing iOS applications. Through a series of hands-on projects, students explore the intricacies of Swift, app architecture, and user experience design.",
+                "Purpose": "The primary purpose of this group is to equip students with the skills and knowledge needed to create robust, scalable iOS applications. We emphasize practical learning, real-world problem-solving, and collaboration to prepare students for careers in mobile development.",
+                "Values": "• Practical Application Development\n• User-Centered Design\n• Collaborative Learning\n• Continuous Improvement",
+                "Goals": "• Develop fully functional iOS applications\n• Master Swift and Xcode tools\n• Implement advanced UI/UX design principles\n• Prepare for professional iOS developer roles"
             ]
         ),
-        Community(
-            name: "Creative Writers' Circle",
-            imageName: "pencil",
-            tasks: [
-                Task(
-                    name: "Write a Short Story",
-                    description: "Write a 1000-word short story on any theme of your choice.",
-                    date: Date().addingTimeInterval(86400 * 4),
-                    subtasks: ["Choose a theme", "Write the first draft", "Revise and edit"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Poetry Workshop",
-                    description: "Attend the online poetry workshop and create a new poem.",
-                    date: Date().addingTimeInterval(86400 * 6),
-                    subtasks: ["Register for the workshop", "Brainstorm ideas", "Submit your poem for feedback"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Tech Innovators Meetup",
-            imageName: "desktopcomputer",
-            tasks: [
-                Task(
-                    name: "AI & Machine Learning Seminar",
-                    description: "Attend a seminar on AI & Machine Learning advances.",
-                    date: Date().addingTimeInterval(86400 * 7),
-                    subtasks: ["Register for the event", "Read about AI basics", "Prepare questions for the Q&A"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Hackathon Preparation",
-                    description: "Join the group’s next hackathon preparation session.",
-                    date: Date().addingTimeInterval(86400 * 10),
-                    subtasks: ["Form a team", "Brainstorm project ideas", "Practice coding challenges"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Travel Enthusiasts",
-            imageName: "airplane",
-            tasks: [
-                Task(
-                    name: "Explore Thailand",
-                    description: "Plan a 2-week trip to Thailand.",
-                    date: Date().addingTimeInterval(86400 * 30),
-                    subtasks: ["Research destinations", "Book flights and accommodations", "Create a travel itinerary"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Backpacking Tips",
-                    description: "Share tips on backpacking for a month in Europe.",
-                    date: Date().addingTimeInterval(86400 * 15),
-                    subtasks: ["Write a blog post", "Join discussion group", "Prepare a packing list"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Fitness Warriors",
-            imageName: "heart.fill",
-            tasks: [
-                Task(
-                    name: "Strength Training Plan",
-                    description: "Follow a 4-week strength training program.",
-                    date: Date().addingTimeInterval(86400 * 2),
-                    subtasks: ["Download workout plan", "Track your progress", "Share your results with the group"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Nutrition for Fitness",
-                    description: "Learn about nutrition plans for athletes.",
-                    date: Date().addingTimeInterval(86400 * 8),
-                    subtasks: ["Research meal plans", "Prepare a grocery list", "Discuss with your trainer"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Board Game Enthusiasts",
-            imageName: "gamecontroller",
-            tasks: [
-                Task(
-                    name: "Weekly Board Game Night",
-                    description: "Join the weekly board game night at the local café.",
-                    date: Date().addingTimeInterval(86400 * 5),
-                    subtasks: ["Sign up for the event", "Bring your favorite board game", "Meet new players"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Learn Strategy Games",
-                    description: "Learn and master strategy board games like Catan and Risk.",
-                    date: Date().addingTimeInterval(86400 * 10),
-                    subtasks: ["Read strategy guides", "Play online versions", "Practice with friends"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Cycling Adventures",
-            imageName: "bicycle",
-            tasks: [
-                Task(
-                    name: "Mountain Biking Tour",
-                    description: "Plan a weekend mountain biking tour with the group.",
-                    date: Date().addingTimeInterval(86400 * 6),
-                    subtasks: ["Choose a route", "Get your bike serviced", "Pack biking essentials"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Bike Maintenance Workshop",
-                    description: "Attend a workshop on basic bike maintenance.",
-                    date: Date().addingTimeInterval(86400 * 3),
-                    subtasks: ["Register for the workshop", "Bring your bike", "Learn bike repair techniques"],
-                    isCompleted: false
-                )
-            ]
-        ),
-        Community(
-            name: "Film Buffs",
-            imageName: "film",
-            tasks: [
-                Task(
-                    name: "Watch Classic Movies",
-                    description: "Watch and discuss classic films from the 1950s and 60s.",
-                    date: Date().addingTimeInterval(86400 * 4),
-                    subtasks: ["Watch 'Casablanca'", "Watch 'Vertigo'", "Prepare for the group discussion"],
-                    isCompleted: false
-                ),
-                Task(
-                    name: "Film Editing Workshop",
-                    description: "Attend a workshop on video editing for indie filmmakers.",
-                    date: Date().addingTimeInterval(86400 * 12),
-                    subtasks: ["Sign up for the workshop", "Bring your project", "Submit your edits for review"],
-                    isCompleted: false
-                )
-            ]
-        )
     ]
 }
 
@@ -223,9 +58,10 @@ struct CommunityView: View {
     @State private var showAddTaskView = false
     @State private var searchText = ""
     @State private var showFavoritesOnly = false
+    @State private var showAddCommunityView = false
     
     @State private var communities = CommunityData.allCommunities
-
+    
     var filteredCommunities: [Community] {
         let filtered = communities.filter {
             (searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)) &&
@@ -313,7 +149,7 @@ struct CommunityView: View {
                                                     .foregroundColor(community.isFavorite ? .yellow : .gray)
                                             }
                                         }
-                                        .padding(.vertical, 8)
+                                        .padding(.vertical, 10)
                                         .padding(.horizontal, 10)
                                         .background(Color(red: 0.247, green: 0.239, blue: 0.239))
                                         
@@ -334,6 +170,28 @@ struct CommunityView: View {
                 }
                 .background(Color.black)
                 
+                Button(action: {
+                    showAddCommunityView.toggle()
+                }) {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                   startPoint: .leading,
+                                                   endPoint: .trailing))
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
+                }
+                .frame(width: 60, height: 60)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                
+                .sheet(isPresented: $showAddCommunityView) {
+                    AddCommunityView(communities: $communities)
+                }
+                
                 Spacer()
             }
             .padding()
@@ -346,6 +204,60 @@ struct CommunityView: View {
     }
 }
 
+struct AddCommunityView: View {
+    @Binding var communities: [Community]
+    @Environment(\.dismiss) var dismiss
+    
+    @State private var communityName: String = ""
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Create New Community")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 20)
+                
+                TextField("Community Name", text: $communityName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+                Spacer()
+                
+                Button(action: {
+                    if !communityName.isEmpty{
+                        let newCommunity = Community(
+                            name: communityName,
+                            imageName: "swift",
+                            resources: [],
+                            isFavorite: false
+                        )
+                        communities.append(newCommunity)
+                        dismiss()
+                    }
+                }) {
+                    Text("Create Community")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                   startPoint: .leading,
+                                                   endPoint: .trailing))
+                        .clipShape(Capsule())
+                        .shadow(radius: 5)
+                }
+                .frame(width: 200, height: 60)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                
+            }
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .navigationBarTitle("Add Community", displayMode: .inline)
+        }
+    }
+}
 
 
 struct CommunityDetailView: View {
@@ -353,7 +265,10 @@ struct CommunityDetailView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var showAddTaskView = false
+    @State private var showAddResourceView = false
+    @State private var showAddDescriptionView = false
     @State private var selectedTask: Task?
+    @State private var selectedTab = 0
     
     var body: some View {
         ZStack {
@@ -388,32 +303,131 @@ struct CommunityDetailView: View {
                 Divider()
                     .background(Color.white)
                 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 10) {
-                        if community.tasks.isEmpty {
-                            Text("No tasks available")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        } else {
-                            ForEach($community.tasks) { $task in
-                                Button(action: {
-                                    selectedTask = task  // Set the selected task
-                                }) {
-                                    TaskRowView(task: $task, onComplete: {})
-                                        .padding(.horizontal)
-                                        .cornerRadius(10)
+
+                HStack {
+                    if selectedTab > 0 {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                            Text("Previous")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        .frame(width: 100, alignment: .leading)
+                    } else {
+                        Spacer().frame(width: 100)
+                    }
+                    
+                    Spacer()
+                    
+                    Text(selectedTab == 0 ? "Tasks" : selectedTab == 1 ? "Resources" : "About")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    if selectedTab < 2 {
+                        HStack {
+                            Text("Next")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        .frame(width: 100, alignment: .trailing)
+                    } else {
+                        Spacer().frame(width: 100)
+                    }
+                }
+                
+                TabView(selection: $selectedTab) {
+                    
+                    ScrollView {
+                        VStack(spacing: 10) {
+                            if community.tasks.isEmpty {
+                                Text("No tasks available")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            } else {
+                                ForEach($community.tasks) { $task in
+                                    Button(action: {
+                                        selectedTask = task
+                                    }) {
+                                        TaskRowView(task: $task, onComplete: {})
+                                            .padding(.horizontal)
+                                            .cornerRadius(10)
+                                    }
                                 }
                             }
                         }
-                    }
+                        .padding(.leading)
+                    }.tag(0)
+                    
+                    ScrollView {
+                        VStack(spacing: 10) {
+                            if community.resources.isEmpty {
+                                Text("No resources available")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            } else {
+                                ForEach(community.resources) { resource in
+                                    Link(destination: URL(string: resource.url)!) {
+                                        Text(resource.title)
+                                            .font(.headline)
+                                            .foregroundColor(.blue)
+                                            .underline()
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+                        }
+                        .padding(.leading)
+                    }.tag(1)
+                    
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 10) {
+                            if community.description.isEmpty {
+                                Text("No information available")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                            else {
+                                ForEach(community.description.keys.sorted(), id: \.self) { title in
+                                    Text(title)
+                                        .font(.headline)
+                                        .foregroundColor(.cyan)
+                                    
+                                    Text(community.description[title] ?? "")
+                                        .foregroundColor(.white)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }.tag(2)
+                    
                 }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
                 Spacer()
                 
                 Button(action: {
-                    showAddTaskView.toggle()
+                    if selectedTab == 0 {
+                        showAddTaskView.toggle()
+                    } else if (selectedTab == 1) {
+                        showAddResourceView.toggle()
+                    } else if (selectedTab == 2) {
+                        showAddDescriptionView.toggle()
+                    }
                 }) {
                     Image(systemName: "plus")
                         .resizable()
@@ -428,10 +442,16 @@ struct CommunityDetailView: View {
                 }
                 .frame(width: 60, height: 60)
                 .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .sheet(isPresented: $showAddTaskView) {
                 AddCommunityTaskView(community: $community)
+            }
+            .sheet(isPresented: $showAddResourceView) {
+                AddCommunityResourceView(community: $community)
+            }
+            .sheet(isPresented: $showAddDescriptionView) {
+                AddCommunityDescriptionView(community: $community)
             }
             .sheet(item: $selectedTask) { task in
                 TaskDetailsView(task: task)
@@ -439,6 +459,70 @@ struct CommunityDetailView: View {
         }
     }
 }
+
+
+struct AddCommunityResourceView: View {
+    @Binding var community: Community
+    @Environment(\.dismiss) var dismiss
+    
+    @State private var title: String = ""
+    @State private var url: String = ""
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Resource Title")) {
+                    TextField("Enter resource title", text: $title)
+                }
+                
+                Section(header: Text("Resource URL")) {
+                    TextField("Enter resource URL", text: $url)
+                        .keyboardType(.URL)
+                }
+            }
+            .navigationBarTitle("Add Resource", displayMode: .inline)
+            .navigationBarItems(leading: Button("Cancel") {
+                dismiss()
+            }, trailing: Button("Add") {
+                let newResource = Resource(title: title, url: url)
+                community.resources.append(newResource)
+                dismiss()
+            }.disabled(title.isEmpty || url.isEmpty))
+        }
+    }
+}
+
+struct AddCommunityDescriptionView: View {
+    @Binding var community: Community
+    @Environment(\.dismiss) var dismiss
+    
+    @State private var title: String = ""
+    @State private var text: String = ""
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Description Title")) {
+                    TextField("Enter description title", text: $title)
+                }
+                
+                Section(header: Text("Description Text")) {
+                    TextEditor(text: $text)
+                        .frame(height: 150)
+                }
+            }
+            .navigationBarTitle("Add Description", displayMode: .inline)
+            .navigationBarItems(leading: Button("Cancel") {
+                dismiss()
+            }, trailing: Button("Add") {
+                community.description[title] = text
+                dismiss()
+            }.disabled(title.isEmpty || text.isEmpty))
+        }
+    }
+}
+
+
 
 
 
