@@ -9,12 +9,12 @@ import SwiftUI
 
 // MARK: - Content View
 struct ContentView: View {
+    @StateObject var userViewModel = UserViewModel()
     @StateObject var taskViewModel = TaskViewModel()
-    @State private var isSignedIn: Bool = false
     
     var body: some View {
         NavigationView {
-            if isSignedIn {
+            if userViewModel.currentUser != nil {
                 TabView {
                     TasksView(taskViewModel: taskViewModel)
                         .tabItem {
@@ -41,17 +41,23 @@ struct ContentView: View {
                             Label("Profile", systemImage: "person")
                         }
                 }
-                .onAppear {
-                    isSignedIn = true
-                }
             } else {
-                SignInView(isSignedIn: $isSignedIn)
+                SignInView(isSignedIn: Binding(
+                    get: { userViewModel.currentUser != nil },
+                    set: { if !$0 { userViewModel.logOut() } }
+                ))
             }
         }
+        .environmentObject(userViewModel)
     }
 }
 
 // MARK: - Preview
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        let userViewModel = UserViewModel()
+        
+        ContentView()
+            .environmentObject(userViewModel)
+    }
 }

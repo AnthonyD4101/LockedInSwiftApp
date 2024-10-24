@@ -1,11 +1,20 @@
 //
-//  TaskModel.swift
+//  AppModels.swift
 //  LockedIn
 //
 //  Created by Anthony Delgado on 10/21/24.
 //
 
 import SwiftUI
+
+// MARK: - User Model
+struct User: Identifiable {
+    let id = UUID()
+    var email: String
+    var username: String
+    var password: String
+    var tasks: [Task] = []
+}
 
 // MARK: - Task Model
 struct Task: Identifiable {

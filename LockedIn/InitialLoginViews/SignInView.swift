@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct SignInView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
     @Binding var isSignedIn: Bool
     @State private var username: String = ""
     @State private var userPassword: String = ""
+    @State private var loginFailed: Bool = false
     
     var body: some View {
         NavigationView {
@@ -74,10 +76,18 @@ struct SignInView: View {
                                 .foregroundColor(.white)
                         }
                         
+                        if loginFailed {
+                            Text("Invalid username or password")
+                                .foregroundColor(.red)
+                                .padding(.top, 8)
+                        }
+                        
                         Button(action: {
-                            // TODO: Implement SignIn Button Funtionality
-                            isSignedIn = true
-                            print("Sign In Clicked")
+                            if userViewModel.logIn(email: username, password: userPassword) {
+                                isSignedIn = true
+                            } else {
+                                loginFailed = true
+                            }
                         }) {
                             Text("Sign In")
                                 .font(.system(size: 24))
@@ -121,8 +131,14 @@ struct SignInView: View {
     }
 }
 
-#Preview {
-    SignInView(isSignedIn: .constant(false))
+// MARK: - Preview
+struct SignInView_Previews: PreviewProvider {
+    static var previews: some View {
+        let userViewModel = UserViewModel()
+        
+        SignInView(isSignedIn: .constant(false))
+            .environmentObject(userViewModel)
+    }
 }
 
 
