@@ -11,6 +11,7 @@ struct CalendarView: View {
     @ObservedObject var taskViewModel: TaskViewModel
     @State private var selectedDate = Date()
     @State private var showAddTaskView = false
+    @State private var selectedTask: Task? = nil
     
     var body: some View {
         ZStack {
@@ -21,8 +22,9 @@ struct CalendarView: View {
                     displayedComponents: .date
                 )
                 .datePickerStyle(GraphicalDatePickerStyle())
-                .frame(maxHeight: UIScreen.main.bounds.height * 0.4)
+                .frame(height: UIScreen.main.bounds.height * 0.5)
                 .preferredColorScheme(.dark)
+                .background(Color.black)
                 
                 VStack(alignment: .leading) {
                     if taskViewModel.tasksFor(date: selectedDate).isEmpty {
@@ -32,14 +34,16 @@ struct CalendarView: View {
                     } else {
                         ScrollView {
                             VStack(alignment: .leading) {
-                                ForEach(taskViewModel.tasksFor(date: selectedDate)) { task in
-                                    TaskRowView(task: .constant(task)) {
-                                        // TODO: Handle task completion
+                                ForEach(taskViewModel.tasksFor(date: selectedDate).indices, id: \.self) { index in
+                                    let taskBinding = $taskViewModel.tasks[taskViewModel.tasks.firstIndex(where: { $0.id == taskViewModel.tasksFor(date: selectedDate)[index].id })!]
+                                    
+                                    TaskRowView(task: taskBinding) {
+                                        handleTaskCompletion(at: index)
                                     }
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 10)
                                     .onTapGesture {
-                                        // TODO: Handle task tap
+                                        selectedTask = taskViewModel.tasksFor(date: selectedDate)[index]
                                     }
                                     
                                     Divider()
@@ -49,10 +53,8 @@ struct CalendarView: View {
                         }
                     }
                 }
-                .padding(.top, 20)
                 .background(Color.black)
                 .cornerRadius(10)
-                .padding()
                 
                 Spacer()
             }
@@ -66,10 +68,21 @@ struct CalendarView: View {
             AddTaskView(tasks: $taskViewModel.tasks)
                 .presentationDetents([.fraction(0.8)])
         }
+        .sheet(item: $selectedTask) { task in
+            TaskDetailsView(task: task)
+        }
+    }
+    
+    // MARK: - Handle Task Completion (Task Deletion)
+    private func handleTaskCompletion(at index: Int) {
+        let taskToDelete = taskViewModel.tasksFor(date: selectedDate)[index]
+        if let actualIndex = taskViewModel.tasks.firstIndex(where: { $0.id == taskToDelete.id }) {
+            taskViewModel.tasks.remove(at: actualIndex)
+        }
     }
 }
+
 
 #Preview {
     CalendarView(taskViewModel: TaskViewModel())
 }
-
