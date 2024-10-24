@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CalendarView: View {
-    @ObservedObject var taskViewModel: TaskViewModel
+    @ObservedObject var taskViewModel = TaskViewModel()
     @State private var selectedDate = Date()
     @State private var showAddTaskView = false
     @State private var selectedTask: Task? = nil
@@ -65,11 +65,13 @@ struct CalendarView: View {
                 .padding(.bottom, 40)
         }
         .sheet(isPresented: $showAddTaskView) {
-            AddTaskView(tasks: $taskViewModel.tasks)
+            AddTaskView(taskViewModel: taskViewModel)
                 .presentationDetents([.fraction(0.8)])
         }
-        .sheet(item: $selectedTask) { task in
-            TaskDetailsView(task: task)
+        .sheet(item: $selectedTask) { selectedTask in
+            if let index = taskViewModel.tasks.firstIndex(where: { $0.id == selectedTask.id }) {
+                TaskDetailsView(task: $taskViewModel.tasks[index])
+            }
         }
     }
     

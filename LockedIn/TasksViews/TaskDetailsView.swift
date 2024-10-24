@@ -14,13 +14,12 @@ import SwiftUI
 
 // MARK: - Task Details View
 struct TaskDetailsView: View {
-    let task: Task
-    @State private var completedSubtasks: Int = 0
+    @Binding var task: Task
     @State private var subtasks: [Subtask]
     
-    init(task: Task) {
-        self.task = task
-        self._subtasks = State(initialValue: task.subtasks.map { Subtask(name: $0, isCompleted: false) })
+    init(task: Binding<Task>) {
+        self._task = task
+        self._subtasks = State(initialValue: task.wrappedValue.subtasks)
     }
     
     var body: some View {
@@ -34,12 +33,14 @@ struct TaskDetailsView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksListView(subtasks: $subtasks, completedSubtasks: $completedSubtasks)
+                SubtasksListView(subtasks: $subtasks)
                 
-                if completedSubtasks == subtasks.count && subtasks.count > 0 {
+                if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
                     HStack {
                         Spacer()
-                        CompleteTaskButton()
+                        CompleteTaskButton {
+                            print("Task completed!")
+                        }
                         Spacer()
                     }
                     .padding(.vertical, 10)
@@ -51,6 +52,9 @@ struct TaskDetailsView: View {
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
+            .onDisappear {
+                task.subtasks = subtasks
+            }
         }
     }
 }
@@ -106,11 +110,10 @@ struct TaskDueDateView: View {
 // MARK: - Subtasks List View
 struct SubtasksListView: View {
     @Binding var subtasks: [Subtask]
-    @Binding var completedSubtasks: Int
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Sub-tasks (\(completedSubtasks)/\(subtasks.count))")
+            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.horizontal)
@@ -119,7 +122,6 @@ struct SubtasksListView: View {
                 HStack {
                     Button(action: {
                         subtask.isCompleted.toggle()
-                        completedSubtasks = subtasks.filter { $0.isCompleted }.count
                     }) {
                         Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(.white)
@@ -139,18 +141,30 @@ struct SubtasksListView: View {
 
 // MARK: - Complete Task Button
 struct CompleteTaskButton: View {
+    let action: () -> Void
+    
     var body: some View {
-        Text("Complete Task")
-            .font(.system(size: 18, weight: .bold))
-            .padding(.vertical, 8)
-            .padding(.horizontal, 20)
-            .background(Color.green)
-            .foregroundColor(.black)
-            .cornerRadius(20)
+        Button(action: action) {
+            Text("All Subtasks Completed!")
+                .font(.system(size: 18, weight: .bold))
+                .padding(.vertical, 8)
+                .padding(.horizontal, 20)
+                .background(Color.green)
+                .foregroundColor(.black)
+                .cornerRadius(20)
+        }
     }
 }
 
 // MARK: - Preview
-#Preview {
-    TaskDetailsView(task: Task(name: "Sample Task", description: "This is a sample task.", date: Date(), subtasks: ["Subtask 1", "Subtask 2"]))
+struct TaskDetailsView_Preview: PreviewProvider {
+    @State static var task = Task(name: "Sample Task",
+                                  description: "This is a sample task.",
+                                  date: Date(),
+                                  subtasks: [Subtask(name: "Subtask 1", isCompleted: false),
+                                             Subtask(name: "Subtask 2", isCompleted: false)])
+    
+    static var previews: some View {
+        TaskDetailsView(task: $task)
+    }
 }

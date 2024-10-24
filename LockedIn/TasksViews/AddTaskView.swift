@@ -9,12 +9,12 @@ import SwiftUI
 
 // MARK: - Add Task View
 struct AddTaskView: View {
-    @Binding var tasks: [Task]
+    @ObservedObject var taskViewModel: TaskViewModel
     @State private var newTask: String = ""
     @State private var taskDescription: String = ""
     @State private var taskDate = Date()
-    @State private var subtasks: [String] = []
-    @State private var completedSubtasks: Int = 0
+    @State private var subtasks: [Subtask] = []
+    @State private var newSubtask: String = ""
     
     @State private var showSuccessMessage: Bool = false
     @State private var messageOpacity: Double = 0.0
@@ -30,7 +30,7 @@ struct AddTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksView(subtasks: $subtasks, completedSubtasks: $completedSubtasks)
+                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -45,8 +45,8 @@ struct AddTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
-                        tasks.append(task)
+                        _ = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        taskViewModel.addTask(title: newTask, description: taskDescription, dueDate: taskDate, subtasks: subtasks)
                         newTask = ""
                         taskDescription = ""
                         taskDate = Date()
@@ -148,24 +148,27 @@ struct TaskDatePicker: View {
 
 // MARK: - Subtasks View
 struct SubtasksView: View {
-    @Binding var subtasks: [String]
-    @Binding var completedSubtasks: Int
-    @State private var newSubtask: String = ""
-    @State private var isAddingSubtask: Bool = false
+    @Binding var subtasks: [Subtask]
+    @Binding var newSubtask: String // New subtask input binding
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Sub-tasks (\(completedSubtasks)/\(subtasks.count))")
+            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.horizontal)
             
-            ForEach(subtasks, id: \.self) { subtask in
+            ForEach(subtasks) { subtask in
                 HStack {
-                    Image(systemName: completedSubtasks >= subtasks.count ? "checkmark.circle.fill" : "circle")
+                    Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(.white)
+                        .onTapGesture {
+                            if let index = subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                                subtasks[index].isCompleted.toggle()
+                            }
+                        }
                     
-                    Text(subtask)
+                    Text(subtask.name)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                     
@@ -174,48 +177,35 @@ struct SubtasksView: View {
                 .padding()
             }
             
-            if isAddingSubtask {
-                HStack {
-                    TextField("Enter subtask", text: $newSubtask)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    Button(action: {
-                        if !newSubtask.isEmpty {
-                            subtasks.append(newSubtask)
-                            newSubtask = ""
-                            isAddingSubtask = false
-                        }
-                    }) {
-                        Text("Add")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.red)
+            HStack {
+                TextField("Enter subtask", text: $newSubtask)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Button(action: {
+                    if !newSubtask.isEmpty {
+                        let subtask = Subtask(name: newSubtask)
+                        subtasks.append(subtask)
+                        newSubtask = ""
                     }
-                }
-                .padding()
-            }
-            
-            Button(action: {
-                isAddingSubtask.toggle()
-            }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add Subtask")
+                }) {
+                    Text("Add")
                         .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.red)
                 }
-                .foregroundColor(.red)
-                .padding()
             }
+            .padding()
         }
     }
 }
 
+
 // MARK: - Preview
 struct AddTaskViewPreview: View {
-    @State private var tasksPreview: [Task] = []
+    @State private var taskViewModel = TaskViewModel()
     
     var body: some View {
-        AddTaskView(tasks: $tasksPreview)
+        AddTaskView(taskViewModel: taskViewModel)
     }
 }
 

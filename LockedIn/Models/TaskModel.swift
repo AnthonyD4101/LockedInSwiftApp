@@ -13,7 +13,7 @@ struct Task: Identifiable {
     var name: String
     var description: String
     var date: Date
-    var subtasks: [String] = []
+    var subtasks: [Subtask] = []
     var isCompleted: Bool = false
 }
 
@@ -21,5 +21,5 @@ struct Task: Identifiable {
 struct Subtask: Identifiable {
     let id = UUID()
     let name: String
-    var isCompleted: Bool
+    var isCompleted: Bool = false
 }
