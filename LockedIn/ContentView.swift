@@ -39,6 +39,7 @@ struct ContentView: View {
                         .tabItem {
                             Label("Profile", systemImage: "person")
                         }
+                        .environmentObject(taskViewModel)
                 }
             } else {
                 SignInView(isSignedIn: Binding(
@@ -56,8 +57,10 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let userViewModel = UserViewModel()
+        let taskViewModel = TaskViewModel()
         
         ContentView()
             .environmentObject(userViewModel)
+            .environmentObject(taskViewModel)
     }
 }

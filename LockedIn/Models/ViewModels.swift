@@ -65,4 +65,20 @@ class TaskViewModel: ObservableObject {
             tasks[taskIndex].subtasks.remove(at: index)
         }
     }
+    
+    var totalTasks: Int {
+        tasks.count
+    }
+    
+    var completedTasks: Int {
+        tasks.filter { $0.isCompleted }.count
+    }
+    
+    var totalSubtasks: Int {
+        tasks.reduce(0) { $0 + $1.subtasks.count }
+    }
+    
+    var completedSubtasks: Int {
+        tasks.reduce(0) { $0 + $1.subtasks.filter { $0.isCompleted }.count }
+    }
 }
