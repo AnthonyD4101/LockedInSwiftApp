@@ -5,13 +5,18 @@
 //  Created by Anthony Delgado on 10/18/24.
 //
 
+// TODO: After SignUp, redirect user to correct view after
+
 import SwiftUI
 
 struct SignUpView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var userEmail: String = ""
     @State private var username: String = ""
     @State private var userCreatePassword: String = ""
     @State private var userConfirmPassword: String = ""
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
     
     // TODO: Fix some styling (spacing between page elements is a little wonky)
     var body: some View {
@@ -44,8 +49,7 @@ struct SignUpView: View {
                 
                 // Sign Up Button
                 Button(action: {
-                    // TODO: Implement SignUp Button Functionality
-                    print("Sign Up Clicked")
+                    handleSignUp()
                 }) {
                     Text("Sign Up")
                         .font(.system(size: 24))
@@ -64,6 +68,28 @@ struct SignUpView: View {
                 Spacer()
             }
             .padding(.bottom, 40)
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Sign Up"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+    
+    // MARK: - Sign Up Handling
+    private func handleSignUp() {
+        guard userCreatePassword == userConfirmPassword else {
+            alertMessage = "Passwords do not match"
+            showAlert = true
+            return
+        }
+        
+        let success = userViewModel.signUp(email: userEmail, username: username, password: userCreatePassword)
+        
+        if success {
+            alertMessage = "Sign-up successful!"
+            showAlert = true
+        } else {
+            alertMessage = "Email or username already exists"
+            showAlert = true
         }
     }
 }
@@ -89,6 +115,12 @@ struct UserTextField: View {
     }
 }
 
-#Preview {
-    SignUpView()
+// MARK: - Preview
+struct SignUpView_Previews: PreviewProvider {
+    static var previews: some View {
+        let userViewModel = UserViewModel()
+        
+        SignUpView()
+            .environmentObject(userViewModel)
+    }
 }

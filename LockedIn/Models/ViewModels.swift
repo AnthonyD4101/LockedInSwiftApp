@@ -9,16 +9,26 @@ import SwiftUI
 import Combine
 
 class UserViewModel: ObservableObject {
-    @Published var currentUser: User?
+    @Published var currentUser: User? = nil
+    @Published var users: [User] = []
     
-    func logIn(email: String, password: String) -> Bool {
-        let exampleUser = User(email: "User@example.com", username: "exampleUser", password: "Password123")
-        
-        if email == exampleUser.email && password == exampleUser.password {
-            currentUser = exampleUser
-            return true
+    func signUp(email: String, username: String, password: String) -> Bool {
+        if users.contains(where: { $0.email == email || $0.username == username }) {
+            return false
         }
         
+        let newUser = User(email: email, username: username, password: password)
+        users.append(newUser)
+        currentUser = newUser
+        
+        return true
+    }
+    
+    func logIn(email: String, password: String) -> Bool {
+        if let user = users.first(where: { $0.email == email && $0.password == password }) {
+            currentUser = user
+            return true
+        }
         return false
     }
     

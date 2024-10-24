@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Content View
 struct ContentView: View {
     @StateObject var userViewModel = UserViewModel()
     @StateObject var taskViewModel = TaskViewModel()
@@ -48,6 +47,7 @@ struct ContentView: View {
                 ))
             }
         }
+        .preferredColorScheme(.dark)
         .environmentObject(userViewModel)
     }
 }

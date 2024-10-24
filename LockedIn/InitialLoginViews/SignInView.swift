@@ -115,7 +115,7 @@ struct SignInView: View {
                             .font(.system(size: 18))
                             .bold()
                         
-                        NavigationLink(destination: SignUpView()) {
+                        NavigationLink(destination: SignUpView().environmentObject(userViewModel)) {
                             Text("Sign Up")
                                 .gradientForeground(colors: [.cyan, .blue])
                                 .font(.system(size: 18))
