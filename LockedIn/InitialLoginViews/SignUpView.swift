@@ -17,37 +17,63 @@ struct SignUpView: View {
     @State private var userConfirmPassword: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
-    
-    // TODO: Fix some styling (spacing between page elements is a little wonky)
+    @Environment(\.horizontalSizeClass) var widthSizeClass
+    @Environment(\.verticalSizeClass) var heightSizeClass
+
     var body: some View {
+        let orientation = DeviceOrientation(
+            widthSizeClass: widthSizeClass,
+            heightSizeClass: heightSizeClass
+        )
+
         ZStack {
             Color(.black)
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack {
-                // Heading
-                VStack {
-                    Text("Create your account!")
-                        .foregroundColor(.white)
-                        .font(.system(size: 24))
-                        .bold()
-                        .underline()
-                }
-                .padding(.top, 70)
-                
+                // Title
+                Text("Create your account!")
+                    .foregroundColor(.white)
+                    .font(.system(size: 24))
+                    .bold()
+                    .underline()
+                    .padding(.top, 30)
+                    .padding(.bottom, 30)
+
                 Spacer()
-                
-                // Sign Up Credentials
-                VStack(spacing: 16) {
-                    UserTextField(title: "Email", text: $userEmail)
-                    UserTextField(title: "Username", text: $username)
-                    UserTextField(title: "Create Password", text: $userCreatePassword)
-                    UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+
+                if orientation.isLandscape(device: .iPadFull) ||
+                    orientation.isLandscape(device: .iPhone) ||
+                    orientation.isLandscape(device: .iPhonePlusOrMax) {
+                    
+                    // Two-Column Layout for Text Fields
+                    HStack(spacing: 30) {
+                        VStack(spacing: 16) {
+                            UserTextField(title: "Email", text: $userEmail)
+                            UserTextField(title: "Username", text: $username)
+                        }
+                        .frame(maxWidth: 300)
+
+                        VStack(spacing: 16) {
+                            UserTextField(title: "Create Password", text: $userCreatePassword)
+                            UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+                        }
+                        .frame(maxWidth: 300)
+                    }
+                } else {
+                    // Vertical Layout for Text Fields in Portrait
+                    VStack(spacing: 16) {
+                        UserTextField(title: "Email", text: $userEmail)
+                        UserTextField(title: "Username", text: $username)
+                        UserTextField(title: "Create Password", text: $userCreatePassword)
+                        UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+                    }
+                    .padding(.horizontal, 40)
                 }
-                .padding(.horizontal, 40)
-                .padding(.top, 10)
-                
-                // Sign Up Button
+
+                Spacer()
+
+                // Sign-Up Button
                 Button(action: {
                     handleSignUp()
                 }) {
@@ -63,27 +89,25 @@ struct SignUpView: View {
                         )
                         .cornerRadius(8)
                 }
+                .padding(.bottom, 40)
                 .padding(.top, 30)
-                
-                Spacer()
             }
-            .padding(.bottom, 40)
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Sign Up"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
             }
         }
     }
-    
-    // MARK: - Sign Up Handling
+
+    // MARK: - Sign-Up Handling
     private func handleSignUp() {
         guard userCreatePassword == userConfirmPassword else {
             alertMessage = "Passwords do not match"
             showAlert = true
             return
         }
-        
+
         let success = userViewModel.signUp(email: userEmail, username: username, password: userCreatePassword)
-        
+
         if success {
             alertMessage = "Sign-up successful!"
             showAlert = true
@@ -94,17 +118,18 @@ struct SignUpView: View {
     }
 }
 
+// MARK: - Helper Views
 struct UserTextField: View {
     var title: String
     @Binding var text: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .foregroundColor(.white)
                 .font(.system(size: 18))
                 .bold()
-            
+
             TextField("", text: $text)
                 .padding()
                 .background(Color(red: 32/255, green: 33/255, blue: 33/255))
@@ -119,7 +144,7 @@ struct UserTextField: View {
 struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
         let userViewModel = UserViewModel()
-        
+
         SignUpView()
             .environmentObject(userViewModel)
     }
