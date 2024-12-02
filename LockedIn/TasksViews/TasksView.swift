@@ -68,7 +68,7 @@ struct TasksView: View {
             AddTaskButton(showAddTaskView: $showAddTaskView)
                 .position(
                     x: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
-                        UIScreen.main.bounds.width - 100 : UIScreen.main.bounds.width / 2,
+                        UIScreen.main.bounds.width - 150 : UIScreen.main.bounds.width / 2,
                     y: UIScreen.main.bounds.height - 100
                 )
         }
