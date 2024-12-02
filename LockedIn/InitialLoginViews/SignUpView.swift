@@ -6,6 +6,8 @@
 //
 
 // TODO: After SignUp, redirect user to correct view after
+// TODO: make password fields censored
+// TODO: make sure all fields are filled before proceeding
 
 import SwiftUI
 
@@ -31,7 +33,6 @@ struct SignUpView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-                // Title
                 Text("Create your account!")
                     .foregroundColor(.white)
                     .font(.system(size: 24))
@@ -45,7 +46,6 @@ struct SignUpView: View {
                     orientation.isLandscape(device: .iPhone) ||
                     orientation.isLandscape(device: .iPhonePlusOrMax) {
                     
-                    // Two-Column Layout for Text Fields
                     HStack(spacing: 30) {
                         VStack(spacing: 16) {
                             UserTextField(title: "Email", text: $userEmail)
@@ -60,7 +60,6 @@ struct SignUpView: View {
                         .frame(maxWidth: 300)
                     }
                 } else {
-                    // Vertical Layout for Text Fields in Portrait
                     VStack(spacing: 16) {
                         UserTextField(title: "Email", text: $userEmail)
                         UserTextField(title: "Username", text: $username)
@@ -133,6 +132,8 @@ struct UserTextField: View {
                 .cornerRadius(8)
                 .shadow(radius: 5)
                 .foregroundColor(.white)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
         }
     }
 }

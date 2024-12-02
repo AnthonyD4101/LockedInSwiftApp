@@ -6,26 +6,37 @@
 //
 
 import SwiftUI
+// TODO: remove autocorrect and caps from text fields
+// TODO: have button for add task view to exit instead of drag down
+// TODO: change add view presentation to alter slightly from black background
+
 
 // MARK: - Tasks View
 struct TasksView: View {
     @ObservedObject var taskViewModel: TaskViewModel
     @State private var showAddTaskView = false
     @State private var selectedTask: Task? = nil
-    
+    @Environment(\.horizontalSizeClass) var widthSizeClass
+    @Environment(\.verticalSizeClass) var heightSizeClass
+
     var body: some View {
+        let orientation = DeviceOrientation(
+            widthSizeClass: widthSizeClass,
+            heightSizeClass: heightSizeClass
+        )
+
         ZStack {
             Color(.black)
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack(alignment: .leading) {
                 TasksHeaderView()
-                
+
                 Divider()
                     .background(Color.white)
-                
+
                 let dailyTasks = taskViewModel.tasksFor(date: Date())
-                
+
                 if dailyTasks.isEmpty {
                     Text("No tasks today")
                         .foregroundColor(.white)
@@ -42,18 +53,24 @@ struct TasksView: View {
                                 .onTapGesture {
                                     selectedTask = dailyTasks[index]
                                 }
-                                
+
                                 Divider()
                                     .background(Color.white.opacity(0.3))
                             }
                         }
                     }
                 }
-                
+
                 Spacer()
             }
-            
+
+            // Add Task Button
             AddTaskButton(showAddTaskView: $showAddTaskView)
+                .position(
+                    x: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
+                        UIScreen.main.bounds.width - 100 : UIScreen.main.bounds.width / 2,
+                    y: UIScreen.main.bounds.height - 100
+                )
         }
         .sheet(isPresented: $showAddTaskView) {
             AddTaskView(taskViewModel: taskViewModel)
@@ -65,7 +82,7 @@ struct TasksView: View {
             }
         }
     }
-    
+
     private func removeTask(at index: Int) {
         taskViewModel.removeTask(at: index)
     }
@@ -88,7 +105,7 @@ struct TasksHeaderView: View {
 struct TaskRowView: View {
     @Binding var task: Task
     var onComplete: () -> Void
-    
+
     var body: some View {
         HStack(alignment: .top) {
             Button(action: {
@@ -103,23 +120,23 @@ struct TaskRowView: View {
                     .foregroundColor(task.isCompleted ? .red : .white)
                     .font(.system(size: 20))
             }
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(task.name)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
-                
+
                 if !task.description.isEmpty {
                     Text(task.description)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white.opacity(0.7))
                 }
-                
+
                 Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.red)
             }
-            
+
             Spacer()
         }
         .background(task.isCompleted ? Color.black.opacity(0.3) : Color.clear)
@@ -130,7 +147,7 @@ struct TaskRowView: View {
 // MARK: - Add Task Button
 struct AddTaskButton: View {
     @Binding var showAddTaskView: Bool
-    
+
     var body: some View {
         Button(action: {
             showAddTaskView.toggle()
@@ -147,8 +164,6 @@ struct AddTaskButton: View {
                 .shadow(radius: 5)
         }
         .frame(width: 60, height: 60)
-        .padding()
-        .position(x: UIScreen.main.bounds.width - 50, y: UIScreen.main.bounds.height - 200)
     }
 }
 

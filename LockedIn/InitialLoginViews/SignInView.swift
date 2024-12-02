@@ -32,7 +32,6 @@ struct SignInView: View {
                    orientation.isLandscape(device: .iPhonePlusOrMax) {
                     
                     HStack {
-                        // Logo and Heading
                         VStack(spacing: 0) {
                             Image("LockedInLogo")
                                 .resizable()
@@ -48,14 +47,12 @@ struct SignInView: View {
                         }
                         .frame(maxWidth: .infinity)
                         
-                        // Sign In Credentials
                         formView
-                            .frame(maxWidth: 400) // Compressed to prevent overflow
-                            .padding(.horizontal, 16) // Extra padding for safe content
+                            .frame(maxWidth: 400)
+                            .padding(.horizontal, 16)
                     }
                 } else {
                     VStack {
-                        // Logo and Heading
                         VStack(spacing: 16) {
                             Image("LockedInLogo")
                                 .resizable()
@@ -97,6 +94,8 @@ struct SignInView: View {
                     .padding(.horizontal, 16)
                     .shadow(radius: 5)
                     .foregroundColor(.white)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
             }
             .padding(.bottom, 16)
             
@@ -114,6 +113,8 @@ struct SignInView: View {
                     .padding(.horizontal, 16)
                     .shadow(radius: 5)
                     .foregroundColor(.white)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
             }
             
             if loginFailed {
