@@ -119,7 +119,6 @@ struct SignInView: View {
             if loginFailed {
                 Text("Invalid username or password")
                     .foregroundColor(.red)
-                    .padding(.top, 8)
             }
             
             Button(action: {
@@ -141,7 +140,7 @@ struct SignInView: View {
                     )
                     .cornerRadius(8)
             }
-            .padding(.top, 30)
+            .padding(.top, 20)
                         
             // Create Account
             VStack(spacing: 8) {
