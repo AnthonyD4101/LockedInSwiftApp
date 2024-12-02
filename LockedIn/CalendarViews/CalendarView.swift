@@ -11,7 +11,7 @@ struct CalendarView: View {
     @ObservedObject var taskViewModel = TaskViewModel()
     @State private var selectedDate = Date()
     @State private var showAddTaskView = false
-    @State private var selectedTask: Task? = nil
+    @State private var selectedTask: UserTask? = nil
     
     var body: some View {
         ZStack {

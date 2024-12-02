@@ -44,7 +44,7 @@ struct AddCommunityTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        let task = UserTask(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
                         community.tasks.append(task)
                         newTask = ""
                         taskDescription = ""

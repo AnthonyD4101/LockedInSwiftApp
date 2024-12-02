@@ -14,10 +14,10 @@ import SwiftUI
 
 // MARK: - Task Details View
 struct TaskDetailsView: View {
-    @Binding var task: Task
+    @Binding var task: UserTask
     @State private var subtasks: [Subtask]
     
-    init(task: Binding<Task>) {
+    init(task: Binding<UserTask>) {
         self._task = task
         self._subtasks = State(initialValue: task.wrappedValue.subtasks)
     }
@@ -158,7 +158,7 @@ struct CompleteTaskButton: View {
 
 // MARK: - Preview
 struct TaskDetailsView_Preview: PreviewProvider {
-    @State static var task = Task(name: "Sample Task",
+    @State static var task = UserTask(name: "Sample Task",
                                   description: "This is a sample task.",
                                   date: Date(),
                                   subtasks: [Subtask(name: "Subtask 1", isCompleted: false),

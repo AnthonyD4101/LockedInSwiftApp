@@ -13,11 +13,11 @@ struct User: Identifiable {
     var email: String
     var username: String
     var password: String
-    var tasks: [Task] = []
+    var tasks: [UserTask] = []
 }
 
 // MARK: - Task Model
-struct Task: Identifiable {
+struct UserTask: Identifiable {
     let id = UUID()
     var name: String
     var description: String
@@ -45,7 +45,7 @@ struct Community: Identifiable {
     let id = UUID()
     let name: String
     let imageName: String
-    var tasks: [Task] = []
+    var tasks: [UserTask] = []
     var resources: [Resource]
     var isFavorite: Bool = false
     var description: [String: String] = [:]

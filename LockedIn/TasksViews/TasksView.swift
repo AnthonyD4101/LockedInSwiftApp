@@ -11,7 +11,7 @@ import SwiftUI
 struct TasksView: View {
     @ObservedObject var taskViewModel: TaskViewModel
     @State private var showAddTaskView = false
-    @State private var selectedTask: Task? = nil
+    @State private var selectedTask: UserTask? = nil
     
     var body: some View {
         ZStack {
@@ -86,7 +86,7 @@ struct TasksHeaderView: View {
 
 // MARK: - Tasks Row View
 struct TaskRowView: View {
-    @Binding var task: Task
+    @Binding var task: UserTask
     var onComplete: () -> Void
     
     var body: some View {

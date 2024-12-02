@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DB61C0CB2CFD4AE900E3929E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DB61C0CA2CFD4AE900E3929E /* FirebaseAuth */; };
+		DB61C0CD2CFD4AE900E3929E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DB61C0CC2CFD4AE900E3929E /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DB8B4C022CA7A9BD00D48852 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB61C0CB2CFD4AE900E3929E /* FirebaseAuth in Frameworks */,
+				DB61C0CD2CFD4AE900E3929E /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = LockedIn;
 			packageProductDependencies = (
+				DB61C0CA2CFD4AE900E3929E /* FirebaseAuth */,
+				DB61C0CC2CFD4AE900E3929E /* FirebaseFirestore */,
 			);
 			productName = LockedIn;
 			productReference = DB8B4BF12CA7A9BA00D48852 /* LockedIn.app */;
@@ -195,6 +204,9 @@
 			);
 			mainGroup = DB8B4BE82CA7A9BA00D48852;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DB61C0C92CFD4AE900E3929E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DB8B4BF22CA7A9BA00D48852 /* Products */;
 			projectDirPath = "";
@@ -396,6 +408,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LockedIn/Preview Content\"";
+				DEVELOPMENT_TEAM = DB5KAW5KZR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -424,6 +437,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LockedIn/Preview Content\"";
+				DEVELOPMENT_TEAM = DB5KAW5KZR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -552,6 +566,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DB61C0C92CFD4AE900E3929E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DB61C0CA2CFD4AE900E3929E /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB61C0C92CFD4AE900E3929E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		DB61C0CC2CFD4AE900E3929E /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB61C0C92CFD4AE900E3929E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DB8B4BE92CA7A9BA00D48852 /* Project object */;
 }

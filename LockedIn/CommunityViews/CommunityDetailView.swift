@@ -14,7 +14,7 @@ struct CommunityDetailView: View {
     @State private var showAddTaskView = false
     @State private var showAddResourceView = false
     @State private var showAddDescriptionView = false
-    @State private var selectedTask: Task?
+    @State private var selectedTask: UserTask?
     @State private var selectedTab = 0
     
     @ObservedObject var taskViewModel: TaskViewModel

@@ -45,7 +45,7 @@ struct AddTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        _ = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        _ = UserTask(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
                         taskViewModel.addTask(title: newTask, description: taskDescription, dueDate: taskDate, subtasks: subtasks)
                         newTask = ""
                         taskDescription = ""

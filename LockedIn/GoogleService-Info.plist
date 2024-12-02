@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAnhANroXfNUuTop5s3-2lCuyeAFxrEE8E</string>
+	<key>GCM_SENDER_ID</key>
+	<string>766672831405</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>COSC4355.LockedIn</string>
+	<key>PROJECT_ID</key>
+	<string>lockedin-de14a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>lockedin-de14a.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:766672831405:ios:36a3c22f1c36f08c469724</string>
+</dict>
+</plist>

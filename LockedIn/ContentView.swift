@@ -11,9 +11,12 @@ struct ContentView: View {
     @StateObject var userViewModel = UserViewModel()
     @StateObject var taskViewModel = TaskViewModel()
     
+    @StateObject var dbUserViewModel = DBUserViewModel()
+    @StateObject var dbTaskViewModel = DBTaskViewModel()
+    
     var body: some View {
         NavigationView {
-            if userViewModel.currentUser != nil {
+            if dbUserViewModel.currentUser != nil {
                 TabView {
                     TasksView(taskViewModel: taskViewModel)
                         .tabItem {
@@ -43,13 +46,13 @@ struct ContentView: View {
                 }
             } else {
                 SignInView(isSignedIn: Binding(
-                    get: { userViewModel.currentUser != nil },
-                    set: { if !$0 { userViewModel.logOut() } }
+                    get: { dbUserViewModel.currentUser != nil },
+                    set: { if !$0 { dbUserViewModel.logOut() } }
                 ))
             }
         }
         .preferredColorScheme(.dark)
-        .environmentObject(userViewModel)
+        .environmentObject(dbUserViewModel)
     }
 }
 
