@@ -6,7 +6,8 @@
 //
 
 // TODO: make it so on the selected date when u click add task, set to that date automatically
-// TODO: the button goes off screen, make the tasks scrollable maybe
+// TODO: the button goes off screen, make the tasks scrollable
+
 import SwiftUI
 
 struct CalendarView: View {
@@ -122,8 +123,10 @@ struct CalendarView: View {
             // Add Task Button
             AddTaskButton(showAddTaskView: $showAddTaskView)
                 .position(
-                    x: UIScreen.main.bounds.width - 80,
-                    y: UIScreen.main.bounds.height - 100
+                    x: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
+                        UIScreen.main.bounds.width - 100 : UIScreen.main.bounds.width - 60,
+                    y: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
+                        UIScreen.main.bounds.height - 100 : UIScreen.main.bounds.height - 200
                 )
         }
         .sheet(isPresented: $showAddTaskView) {
