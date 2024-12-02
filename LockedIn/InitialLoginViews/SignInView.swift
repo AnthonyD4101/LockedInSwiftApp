@@ -33,11 +33,11 @@ struct SignInView: View {
                     
                     HStack {
                         // Logo and Heading
-                        VStack(spacing: 16) {
+                        VStack(spacing: 0) {
                             Image("LockedInLogo")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(maxWidth: 300, maxHeight: 300)
+                                .frame(maxWidth: 200, maxHeight: 200)
                                 .shadow(color: Color.white.opacity(0.5), radius: 30, x: 0, y: 0)
                                 .shadow(color: Color.white.opacity(0.8), radius: 15, x: 0, y: 0)
                             
@@ -70,11 +70,8 @@ struct SignInView: View {
                                 .bold()
                         }
                         .padding()
-                        
-                        Spacer()
-                        
+                                                
                         formView
-                            .padding(.top, 30)
                             .padding(.bottom, 40)
                         
                         Spacer()
@@ -92,7 +89,6 @@ struct SignInView: View {
                     .font(.system(size: 18))
                     .bold()
                     .padding(.horizontal, 16)
-                    .padding(.top, 50)
                 
                 TextField("", text: $username)
                     .padding()
@@ -146,9 +142,7 @@ struct SignInView: View {
                     .cornerRadius(8)
             }
             .padding(.top, 30)
-            
-            Spacer()
-            
+                        
             // Create Account
             VStack(spacing: 8) {
                 Text("Don't have an account?")
@@ -166,6 +160,7 @@ struct SignInView: View {
                 .buttonStyle(PlainButtonStyle())
             }
             .padding(.bottom, 30)
+            
         }
     }
 }
