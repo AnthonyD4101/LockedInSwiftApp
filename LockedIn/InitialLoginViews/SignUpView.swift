@@ -40,7 +40,6 @@ struct SignUpView: View {
                     .padding(.top, 30)
                     .padding(.bottom, 30)
 
-                Spacer()
 
                 if orientation.isLandscape(device: .iPadFull) ||
                     orientation.isLandscape(device: .iPhone) ||
@@ -70,8 +69,6 @@ struct SignUpView: View {
                     }
                     .padding(.horizontal, 40)
                 }
-
-                Spacer()
 
                 // Sign-Up Button
                 Button(action: {
