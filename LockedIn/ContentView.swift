@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    // TODO: Replace Old Models with DB Ones
     @StateObject var userViewModel = UserViewModel()
     @StateObject var taskViewModel = TaskViewModel()
     
@@ -18,12 +19,12 @@ struct ContentView: View {
         NavigationView {
             if dbUserViewModel.currentUser != nil {
                 TabView {
-                    TasksView(taskViewModel: taskViewModel)
+                    TasksView(dbTaskViewModel: dbTaskViewModel, dbUserViewModel: dbUserViewModel)
                         .tabItem {
                             Label("Tasks", systemImage: "list.bullet")
                         }
                     
-                    CalendarView(taskViewModel: taskViewModel)
+                    CalendarView(dbUserViewModel: dbUserViewModel, dbTaskViewModel: dbTaskViewModel)
                         .tabItem {
                             Label("Calendar", systemImage: "calendar")
                         }
@@ -33,6 +34,7 @@ struct ContentView: View {
                             Label("Focus", systemImage: "clock")
                         }
                     
+                    // TODO: Eventually Use DB Models Here
                     CommunityView(taskViewModel: taskViewModel)
                         .tabItem {
                             Label("Community", systemImage: "person.3")
@@ -42,7 +44,7 @@ struct ContentView: View {
                         .tabItem {
                             Label("Profile", systemImage: "person")
                         }
-                        .environmentObject(taskViewModel)
+                        .environmentObject(dbTaskViewModel)
                 }
             } else {
                 SignInView(isSignedIn: Binding(
@@ -59,11 +61,70 @@ struct ContentView: View {
 // MARK: - Preview
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        let userViewModel = UserViewModel()
-        let taskViewModel = TaskViewModel()
+        let dbUserViewModel = DBUserViewModel()
+        let dbTaskViewModel = DBTaskViewModel()
         
         ContentView()
-            .environmentObject(userViewModel)
-            .environmentObject(taskViewModel)
+            .environmentObject(dbUserViewModel)
+            .environmentObject(dbTaskViewModel)
     }
 }
+
+// MARK: OLD DATA MODEL IMPLEMENTATION
+//struct ContentView: View {
+//    @StateObject var userViewModel = UserViewModel()
+//    @StateObject var taskViewModel = TaskViewModel()
+//    
+//    var body: some View {
+//        NavigationView {
+//            if userViewModel.currentUser != nil {
+//                TabView {
+//                    TasksView(taskViewModel: taskViewModel)
+//                        .tabItem {
+//                            Label("Tasks", systemImage: "list.bullet")
+//                        }
+//                    
+//                    CalendarView(taskViewModel: taskViewModel)
+//                        .tabItem {
+//                            Label("Calendar", systemImage: "calendar")
+//                        }
+//                    
+//                    FocusView()
+//                        .tabItem {
+//                            Label("Focus", systemImage: "clock")
+//                        }
+//                    
+//                    CommunityView(taskViewModel: taskViewModel)
+//                        .tabItem {
+//                            Label("Community", systemImage: "person.3")
+//                        }
+//                    
+//                    ProfileView()
+//                        .tabItem {
+//                            Label("Profile", systemImage: "person")
+//                        }
+//                        .environmentObject(taskViewModel)
+//                }
+//            } else {
+//                SignInView(isSignedIn: Binding(
+//                    get: { userViewModel.currentUser != nil },
+//                    set: { if !$0 { userViewModel.logOut() } }
+//                ))
+//            }
+//        }
+//        .preferredColorScheme(.dark)
+//        .environmentObject(userViewModel)
+//    }
+//}
+//
+//// MARK: - Preview
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let userViewModel = UserViewModel()
+//        let taskViewModel = TaskViewModel()
+//        
+//        ContentView()
+//            .environmentObject(userViewModel)
+//            .environmentObject(taskViewModel)
+//    }
+//}

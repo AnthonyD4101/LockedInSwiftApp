@@ -10,6 +10,8 @@ import Firebase
 
 @main
 struct LockedInApp: App {
+    @StateObject private var dbUserViewModel = DBUserViewModel()
+    @StateObject private var dbTaskViewModel = DBTaskViewModel()
     
     // Needed initialization for Firebase setup
     init() {
@@ -19,6 +21,8 @@ struct LockedInApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(dbUserViewModel)
+                .environmentObject(dbTaskViewModel)
         }
     }
 }

@@ -12,7 +12,10 @@ struct AddCommunityTaskView: View {
     @State private var newTask: String = ""
     @State private var taskDescription: String = ""
     @State private var taskDate = Date()
+    
+    //TODO: FIX LATER
     @State private var subtasks: [Subtask] = []
+    @State private var dbSubtasks: [DBSubtask] = []
     @State private var newSubtask: String = ""
     
     @State private var showSuccessMessage: Bool = false
@@ -29,7 +32,9 @@ struct AddCommunityTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
+                // TODO: REMOVE LATER
+                //SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
+                SubtasksView(subtasks: $dbSubtasks, newSubtask: $newSubtask)
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")

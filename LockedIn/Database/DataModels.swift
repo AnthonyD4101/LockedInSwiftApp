@@ -21,6 +21,7 @@ struct DBTask: Identifiable, Codable {
     var description: String
     var date: Date
     var isCompleted: Bool
+    var subtasks: [DBSubtask]?
 }
 
 struct DBSubtask: Identifiable, Codable {
