@@ -102,6 +102,8 @@ struct TaskNameInput: View {
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.white)
                 .padding(.horizontal)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
         }
     }
 }
@@ -122,6 +124,8 @@ struct TaskDescriptionInput: View {
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)
                 .padding(.horizontal)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
         }
     }
 }
@@ -181,6 +185,8 @@ struct SubtasksView: View {
                 TextField("Enter subtask", text: $newSubtask)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                 
                 Button(action: {
                     if !newSubtask.isEmpty {

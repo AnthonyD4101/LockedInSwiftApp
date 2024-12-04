@@ -6,6 +6,8 @@
 //
 
 // TODO: After SignUp, redirect user to correct view after
+// TODO: make password fields censored
+// TODO: make sure all fields are filled before proceeding
 
 import SwiftUI
 
@@ -31,7 +33,6 @@ struct SignUpView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-                // Title
                 Text("Create your account!")
                     .foregroundColor(.white)
                     .font(.system(size: 24))
@@ -40,13 +41,11 @@ struct SignUpView: View {
                     .padding(.top, 30)
                     .padding(.bottom, 30)
 
-                Spacer()
 
                 if orientation.isLandscape(device: .iPadFull) ||
                     orientation.isLandscape(device: .iPhone) ||
                     orientation.isLandscape(device: .iPhonePlusOrMax) {
                     
-                    // Two-Column Layout for Text Fields
                     HStack(spacing: 30) {
                         VStack(spacing: 16) {
                             UserTextField(title: "Email", text: $userEmail)
@@ -61,17 +60,14 @@ struct SignUpView: View {
                         .frame(maxWidth: 300)
                     }
                 } else {
-                    // Vertical Layout for Text Fields in Portrait
                     VStack(spacing: 16) {
                         UserTextField(title: "Email", text: $userEmail)
                         UserTextField(title: "Username", text: $username)
-                        UserTextField(title: "Create Password", text: $userCreatePassword)
-                        UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+                        UserSecureField(title: "Create Password", text: $userCreatePassword)
+                        UserSecureField(title: "Confirm Password", text: $userConfirmPassword)
                     }
                     .padding(.horizontal, 40)
                 }
-
-                Spacer()
 
                 // Sign-Up Button
                 Button(action: {
@@ -136,6 +132,31 @@ struct UserTextField: View {
                 .cornerRadius(8)
                 .shadow(radius: 5)
                 .foregroundColor(.white)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+        }
+    }
+}
+
+struct UserSecureField: View {
+    var title: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .foregroundColor(.white)
+                .font(.system(size: 18))
+                .bold()
+
+            SecureField("", text: $text)
+                .padding()
+                .background(Color(red: 32/255, green: 33/255, blue: 33/255))
+                .cornerRadius(8)
+                .shadow(radius: 5)
+                .foregroundColor(.white)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
         }
     }
 }

@@ -13,40 +13,82 @@ import SwiftUI
 
 struct StatisticsView: View {
     @EnvironmentObject var taskViewModel: TaskViewModel
+    @Environment(\.horizontalSizeClass) var widthSizeClass
+    @Environment(\.verticalSizeClass) var heightSizeClass
     
     var body: some View {
+        let orientation = DeviceOrientation(
+                    widthSizeClass: widthSizeClass,
+                    heightSizeClass: heightSizeClass
+                )
+        
+        let isLandscape = orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull)
+
         ZStack {
             Color(.black)
                 .edgesIgnoringSafeArea(.all)
             
-            VStack {
-                // chart.bar.xaxis
-                // chart.line.uptrend.xyaxis
-                Image(systemName: "chart.bar.xaxis")
-                    .resizable()
-                    .frame(width: 100, height: 100)
-                    .foregroundColor(.orange)
-                    .padding(.top, 40)
-                
-                Text("Information locked in, just for you!")
-                    .foregroundColor(.white)
-                    .font(.system(size: 28))
-                    .bold()
-                    .padding(.top, 16)
-                    .multilineTextAlignment(.center)
-                
-                Spacer()
-                
-                // Statistics Data
-                VStack(alignment: .leading, spacing: 16) {
-                    StatisticRow(title: "Total Tasks", value: "\(taskViewModel.totalTasks)")
-                    StatisticRow(title: "Completed Tasks", value: "\(taskViewModel.completedTasks)")
-                    StatisticRow(title: "Total Subtasks", value: "\(taskViewModel.totalSubtasks)")
-                    StatisticRow(title: "Completed Subtasks", value: "\(taskViewModel.completedSubtasks)")
+            if isLandscape{
+                HStack {
+                    // chart.bar.xaxis
+                    // chart.line.uptrend.xyaxis
+                    Image(systemName: "chart.bar.xaxis")
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.orange)
+                        .padding(.top, 40)
+                    
+                    Text("Information locked in, just for you!")
+                        .foregroundColor(.white)
+                        .font(.system(size: 28))
+                        .bold()
+                        .padding(.top, 16)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                    
+                    // Statistics Data
+                    VStack(alignment: .leading, spacing: 16) {
+                        StatisticRow(title: "Total Tasks", value: "\(taskViewModel.totalTasks)")
+                        StatisticRow(title: "Completed Tasks", value: "\(taskViewModel.completedTasks)")
+                        StatisticRow(title: "Total Subtasks", value: "\(taskViewModel.totalSubtasks)")
+                        StatisticRow(title: "Completed Subtasks", value: "\(taskViewModel.completedSubtasks)")
+                    }
+                    .padding(.horizontal, 16)
+                    
+                    Spacer()
                 }
-                .padding(.horizontal, 16)
-                
-                Spacer()
+            }
+            else{
+                VStack {
+                    // chart.bar.xaxis
+                    // chart.line.uptrend.xyaxis
+                    Image(systemName: "chart.bar.xaxis")
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.orange)
+                        .padding(.top, 40)
+                    
+                    Text("Information locked in, just for you!")
+                        .foregroundColor(.white)
+                        .font(.system(size: 28))
+                        .bold()
+                        .padding(.top, 16)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                    
+                    // Statistics Data
+                    VStack(alignment: .leading, spacing: 16) {
+                        StatisticRow(title: "Total Tasks", value: "\(taskViewModel.totalTasks)")
+                        StatisticRow(title: "Completed Tasks", value: "\(taskViewModel.completedTasks)")
+                        StatisticRow(title: "Total Subtasks", value: "\(taskViewModel.totalSubtasks)")
+                        StatisticRow(title: "Completed Subtasks", value: "\(taskViewModel.completedSubtasks)")
+                    }
+                    .padding(.horizontal, 16)
+                    
+                    Spacer()
+                }
             }
         }
     }

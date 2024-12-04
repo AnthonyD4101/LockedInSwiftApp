@@ -12,9 +12,7 @@ struct FocusHeaderView: View {
     
     var body: some View {
         HStack {
-            ModeTitle(title: "Lock In", isActive: isFocus)
-            Spacer().frame(width: 70)
-            ModeTitle(title: "Lock Out", isActive: !isFocus)
+            ModeTitle(title: isFocus ? "Lock In" : "Lock Out")
         }
         .padding(.top, 40)
     }
@@ -22,14 +20,13 @@ struct FocusHeaderView: View {
 
 struct ModeTitle: View {
     var title: String
-    var isActive: Bool
     
     var body: some View {
         Text(title)
             .font(.headline)
             .padding()
-            .background(isActive ? Color.white : Color.black)
-            .foregroundColor(isActive ? Color.black : Color.white)
+            .background(Color.white)
+            .foregroundColor(Color.black)
             .cornerRadius(10)
     }
 }

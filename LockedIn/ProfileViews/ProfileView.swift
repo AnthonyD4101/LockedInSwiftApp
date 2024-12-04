@@ -10,8 +10,18 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var taskViewModel: TaskViewModel
+    @Environment(\.horizontalSizeClass) var widthSizeClass
+    @Environment(\.verticalSizeClass) var heightSizeClass
     
     var body: some View {
+        let orientation = DeviceOrientation(
+                    widthSizeClass: widthSizeClass,
+                    heightSizeClass: heightSizeClass
+                )
+        
+        let isLandscape = orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull)
+
+
         NavigationView {
             ZStack {
                 Color(.black)
@@ -41,42 +51,82 @@ struct ProfileView: View {
                     }
                     
                     // MARK: - User Settings and App Statistics Buttons
-                    VStack(spacing: 24) {
-                        NavigationLink(destination: SettingsView()
-                            .environmentObject(userViewModel)
-                            .environmentObject(taskViewModel)
-                        ) {
-                            Text("User Settings")
-                                .font(.system(size: 18))
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(width: 200)
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
-                                                   startPoint: .leading, endPoint: .trailing)
-                                )
-                                .cornerRadius(8)
+                    if isLandscape {
+                        HStack(spacing: 24) {
+                            NavigationLink(destination: SettingsView()
+                                .environmentObject(userViewModel)
+                                .environmentObject(taskViewModel)
+                            ) {
+                                Text("User Settings")
+                                    .font(.system(size: 18))
+                                    .bold()
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200)
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .cornerRadius(8)
+                            }
+                            
+                            NavigationLink(destination: StatisticsView()
+                                .environmentObject(userViewModel)
+                                .environmentObject(taskViewModel)
+                            ) {
+                                Text("App Statistics")
+                                    .font(.system(size: 18))
+                                    .bold()
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200)
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .cornerRadius(8)
+                            }
                         }
-                        
-                        NavigationLink(destination: StatisticsView()
-                            .environmentObject(userViewModel)
-                            .environmentObject(taskViewModel)
-                        ) {
-                            Text("App Statistics")
-                                .font(.system(size: 18))
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(width: 200)
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
-                                                   startPoint: .leading, endPoint: .trailing)
-                                )
-                                .cornerRadius(8)
-                        }
+                        .padding(.top, 36)
                     }
-                    .padding(.top, 36)
+                    else{
+                        VStack(spacing: 24) {
+                            NavigationLink(destination: SettingsView()
+                                .environmentObject(userViewModel)
+                                .environmentObject(taskViewModel)
+                            ) {
+                                Text("User Settings")
+                                    .font(.system(size: 18))
+                                    .bold()
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200)
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .cornerRadius(8)
+                            }
+                            
+                            NavigationLink(destination: StatisticsView()
+                                .environmentObject(userViewModel)
+                                .environmentObject(taskViewModel)
+                            ) {
+                                Text("App Statistics")
+                                    .font(.system(size: 18))
+                                    .bold()
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200)
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .cornerRadius(8)
+                            }
+                        }
+                        .padding(.top, 36)
+                    }
                     
                     Spacer()
                 }

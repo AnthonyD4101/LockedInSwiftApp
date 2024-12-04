@@ -1,7 +1,90 @@
+//
+//  CommunityView.swift
+//  LockedIn
+//
+//  Created by Nicholas Tran on 10/24/24.
+//
+
 import SwiftUI
 
 struct CommunityData {
     static var allCommunities: [Community] = [
+        Community(
+            name: "COSC4355",
+            imageName: "swift",
+            tasks: [
+                Task(
+                    name: "Beta App",
+                    description: "Views for Beta App",
+                    date: Date().addingTimeInterval(86400 * 3),
+                    subtasks: [
+                        Subtask(name: "Community View"),
+                        Subtask(name: "Focus View"),
+                        Subtask(name: "Task View")
+                    ],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "App Specification 2",
+                    description: "Fix App Specification to get points back",
+                    date: Date().addingTimeInterval(86400 * 5),
+                    subtasks: [
+                        Subtask(name: "Fix Mock UP"),
+                        Subtask(name: "Fix UserFlow"),
+                        Subtask(name: "Write Feedback Response")
+                    ],
+                    isCompleted: false
+                )
+            ],
+            resources: [
+                Resource(title: "Official Swift Documentation", url: "https://swift.org/documentation/"),
+                Resource(title: "Swift by Sundell", url: "https://www.swiftbysundell.com/")
+            ],
+            description: [
+                "Group Description": "COSC4355 is a student group dedicated to mastering the art of ubiquitous programming, focusing on designing and developing iOS applications. Through a series of hands-on projects, students explore the intricacies of Swift, app architecture, and user experience design.",
+                "Purpose": "The primary purpose of this group is to equip students with the skills and knowledge needed to create robust, scalable iOS applications. We emphasize practical learning, real-world problem-solving, and collaboration to prepare students for careers in mobile development.",
+                "Values": "• Practical Application Development\n• User-Centered Design\n• Collaborative Learning\n• Continuous Improvement",
+                "Goals": "• Develop fully functional iOS applications\n• Master Swift and Xcode tools\n• Implement advanced UI/UX design principles\n• Prepare for professional iOS developer roles"
+            ]
+        ),
+        Community(
+            name: "COSC4355",
+            imageName: "swift",
+            tasks: [
+                Task(
+                    name: "Beta App",
+                    description: "Views for Beta App",
+                    date: Date().addingTimeInterval(86400 * 3),
+                    subtasks: [
+                        Subtask(name: "Community View"),
+                        Subtask(name: "Focus View"),
+                        Subtask(name: "Task View")
+                    ],
+                    isCompleted: false
+                ),
+                Task(
+                    name: "App Specification 2",
+                    description: "Fix App Specification to get points back",
+                    date: Date().addingTimeInterval(86400 * 5),
+                    subtasks: [
+                        Subtask(name: "Fix Mock UP"),
+                        Subtask(name: "Fix UserFlow"),
+                        Subtask(name: "Write Feedback Response")
+                    ],
+                    isCompleted: false
+                )
+            ],
+            resources: [
+                Resource(title: "Official Swift Documentation", url: "https://swift.org/documentation/"),
+                Resource(title: "Swift by Sundell", url: "https://www.swiftbysundell.com/")
+            ],
+            description: [
+                "Group Description": "COSC4355 is a student group dedicated to mastering the art of ubiquitous programming, focusing on designing and developing iOS applications. Through a series of hands-on projects, students explore the intricacies of Swift, app architecture, and user experience design.",
+                "Purpose": "The primary purpose of this group is to equip students with the skills and knowledge needed to create robust, scalable iOS applications. We emphasize practical learning, real-world problem-solving, and collaboration to prepare students for careers in mobile development.",
+                "Values": "• Practical Application Development\n• User-Centered Design\n• Collaborative Learning\n• Continuous Improvement",
+                "Goals": "• Develop fully functional iOS applications\n• Master Swift and Xcode tools\n• Implement advanced UI/UX design principles\n• Prepare for professional iOS developer roles"
+            ]
+        ),
         Community(
             name: "COSC4355",
             imageName: "swift",
@@ -51,6 +134,8 @@ struct CommunityView: View {
     @State private var searchText = ""
     @State private var showFavoritesOnly = false
     @State private var showAddCommunityView = false
+    @Environment(\.horizontalSizeClass) var widthSizeClass
+    @Environment(\.verticalSizeClass) var heightSizeClass
     
     @State private var communities = CommunityData.allCommunities
     
@@ -63,6 +148,13 @@ struct CommunityView: View {
     }
     
     var body: some View {
+        let orientation = DeviceOrientation(
+                    widthSizeClass: widthSizeClass,
+                    heightSizeClass: heightSizeClass
+                )
+        
+        let isLandscape = orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull)
+
         ZStack {
             Color.black
                 .edgesIgnoringSafeArea(.all)
@@ -71,7 +163,7 @@ struct CommunityView: View {
                 Text("Communities")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .padding(.top)
+                    .padding(.top, isLandscape ? 100 : 50)
                     .foregroundColor(.white)
                 
                 ZStack {
@@ -108,7 +200,6 @@ struct CommunityView: View {
                     .padding(.horizontal)
                 }
                 .frame(height: 45)
-                .padding(.horizontal)
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -160,6 +251,7 @@ struct CommunityView: View {
                         }
                     }
                 }
+                .frame(maxWidth: 600, minHeight: isLandscape ? 140 : 400)
                 .background(Color.black)
                 
                 Button(action: {
@@ -177,14 +269,11 @@ struct CommunityView: View {
                         .shadow(radius: 5)
                 }
                 .frame(width: 60, height: 60)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 .sheet(isPresented: $showAddCommunityView) {
                     AddCommunityView(communities: $communities)
                 }
-                
-                Spacer()
+                .padding(.bottom, isLandscape ? 130 : 0)
             }
             .padding()
             .fullScreenCover(item: $selectedCommunity) { community in

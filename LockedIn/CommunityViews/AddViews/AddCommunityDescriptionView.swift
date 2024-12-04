@@ -19,11 +19,15 @@ struct AddCommunityDescriptionView: View {
             Form {
                 Section(header: Text("Description Title")) {
                     TextField("Enter description title", text: $title)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                 }
                 
                 Section(header: Text("Description Text")) {
                     TextEditor(text: $text)
                         .frame(height: 150)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                 }
             }
             .navigationBarTitle("Add Description", displayMode: .inline)
