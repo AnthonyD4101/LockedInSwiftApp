@@ -54,8 +54,8 @@ struct SignUpView: View {
                         .frame(maxWidth: 300)
                         
                         VStack(spacing: 16) {
-                            UserTextField(title: "Create Password", text: $userCreatePassword)
-                            UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+                            UserSecureField(title: "Create Password", text: $userCreatePassword)
+                            UserSecureField(title: "Confirm Password", text: $userConfirmPassword)
                         }
                         .frame(maxWidth: 300)
                     }

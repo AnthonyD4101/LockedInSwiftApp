@@ -130,9 +130,9 @@ struct CalendarView: View {
             AddTaskButton(showAddTaskView: $showAddTaskView)
                 .position(
                     x: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
-                    UIScreen.main.bounds.width - 80 : UIScreen.main.bounds.width - 60,
+                    UIScreen.main.bounds.width - 180 : UIScreen.main.bounds.width - 55,
                     y: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
-                    UIScreen.main.bounds.height - 100 : UIScreen.main.bounds.height - 200
+                    UIScreen.main.bounds.height - 105 : UIScreen.main.bounds.height - 200
                 )
         }
         .sheet(isPresented: $showAddTaskView) {
