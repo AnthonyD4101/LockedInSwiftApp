@@ -24,6 +24,8 @@ struct AddCommunityView: View {
                 TextField("Community Name", text: $communityName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                 
                 Spacer()
                 

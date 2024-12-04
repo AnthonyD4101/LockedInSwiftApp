@@ -19,11 +19,15 @@ struct AddCommunityResourceView: View {
             Form {
                 Section(header: Text("Resource Title")) {
                     TextField("Enter resource title", text: $title)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                 }
                 
                 Section(header: Text("Resource URL")) {
                     TextField("Enter resource URL", text: $url)
                         .keyboardType(.URL)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                 }
             }
             .navigationBarTitle("Add Resource", displayMode: .inline)

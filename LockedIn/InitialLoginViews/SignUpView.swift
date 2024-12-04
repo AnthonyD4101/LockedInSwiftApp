@@ -63,8 +63,8 @@ struct SignUpView: View {
                     VStack(spacing: 16) {
                         UserTextField(title: "Email", text: $userEmail)
                         UserTextField(title: "Username", text: $username)
-                        UserTextField(title: "Create Password", text: $userCreatePassword)
-                        UserTextField(title: "Confirm Password", text: $userConfirmPassword)
+                        UserSecureField(title: "Create Password", text: $userCreatePassword)
+                        UserSecureField(title: "Confirm Password", text: $userConfirmPassword)
                     }
                     .padding(.horizontal, 40)
                 }
@@ -127,6 +127,29 @@ struct UserTextField: View {
                 .bold()
 
             TextField("", text: $text)
+                .padding()
+                .background(Color(red: 32/255, green: 33/255, blue: 33/255))
+                .cornerRadius(8)
+                .shadow(radius: 5)
+                .foregroundColor(.white)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+        }
+    }
+}
+
+struct UserSecureField: View {
+    var title: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .foregroundColor(.white)
+                .font(.system(size: 18))
+                .bold()
+
+            SecureField("", text: $text)
                 .padding()
                 .background(Color(red: 32/255, green: 33/255, blue: 33/255))
                 .cornerRadius(8)

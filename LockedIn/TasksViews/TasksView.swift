@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-// TODO: remove autocorrect and caps from text fields
 // TODO: have button for add task view to exit instead of drag down
 // TODO: change add view presentation to alter slightly from black background
 
