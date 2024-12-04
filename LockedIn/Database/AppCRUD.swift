@@ -135,7 +135,7 @@ class DBTaskViewModel: ObservableObject {
     func addTask(for userId: String, task: DBTask) async {
         do {
             let _ = try await db.collection("users").document(userId).collection("tasks").addDocument(from: task)
-            await fetchTasks(for: userId) // Refresh tasks after adding
+            await fetchTasks(for: userId)
         } catch {
             print("Error adding task: \(error.localizedDescription)")
         }
@@ -146,7 +146,7 @@ class DBTaskViewModel: ObservableObject {
         guard let taskId = task.id else { return }
         do {
             try await db.collection("users").document(userId).collection("tasks").document(taskId).setData(from: task)
-            await fetchTasks(for: userId) // Refresh tasks after updating
+            await fetchTasks(for: userId)
         } catch {
             print("Error updating task: \(error.localizedDescription)")
         }
@@ -157,7 +157,7 @@ class DBTaskViewModel: ObservableObject {
         guard let taskId = task.id else { return }
         do {
             try await db.collection("users").document(userId).collection("tasks").document(taskId).delete()
-            await fetchTasks(for: userId) // Refresh tasks after removing
+            await fetchTasks(for: userId)
         } catch {
             print("Error deleting task: \(error.localizedDescription)")
         }

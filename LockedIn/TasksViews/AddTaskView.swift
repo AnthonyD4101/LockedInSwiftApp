@@ -32,7 +32,13 @@ struct AddTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
 
-                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtaskName)
+                SubtasksView(
+                    subtasks: $subtasks,
+                    newSubtask: $newSubtaskName,
+                    onAddSubtask: { subtask in
+                        subtasks.append(subtask)
+                    }
+                )
 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -71,16 +77,27 @@ struct AddTaskView: View {
     private func createTask() {
         guard !newTaskName.isEmpty else { return }
 
-        let newTask = DBTask(
+        var newTask = DBTask(
             id: nil,
             name: newTaskName,
             description: taskDescription,
             date: taskDate,
-            isCompleted: false
+            isCompleted: false,
+            subtasks: subtasks
         )
 
         Task {
             await dbTaskViewModel.addTask(for: userId, task: newTask)
+
+            // Fetch the task just added to ensure we have its Firestore-assigned ID
+            await dbTaskViewModel.fetchTasks(for: userId)
+
+            if let addedTask = dbTaskViewModel.tasks.first(where: { $0.name == newTaskName && $0.date == taskDate }) {
+                for subtask in subtasks {
+                    await dbTaskViewModel.addSubtask(to: addedTask, subtask: subtask, for: userId)
+                }
+            }
+
             resetForm()
             showSuccessMessage = true
             messageOpacity = 1.0
@@ -101,7 +118,6 @@ struct AddTaskView: View {
         messageOpacity = 0.0
     }
 }
-
 struct TaskNameInput: View {
     @Binding var taskName: String
 
@@ -159,9 +175,11 @@ struct TaskDatePicker: View {
     }
 }
 
+// MARK: - Subtasks View
 struct SubtasksView: View {
     @Binding var subtasks: [DBSubtask]
-    @Binding var newSubtask: String // New subtask input binding
+    @Binding var newSubtask: String
+    var onAddSubtask: (DBSubtask) -> Void
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -193,6 +211,9 @@ struct SubtasksView: View {
                 TextField("Enter subtask", text: $newSubtask)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
+                    .padding()
+                    .background(Color(red: 32 / 255, green: 33 / 255, blue: 33 / 255))
+                    .cornerRadius(8)
 
                 Button(action: {
                     addSubtask()
@@ -207,11 +228,10 @@ struct SubtasksView: View {
     }
 
     private func addSubtask() {
-        if !newSubtask.isEmpty {
-            let subtask = DBSubtask(id: nil, name: newSubtask, isCompleted: false)
-            subtasks.append(subtask)
-            newSubtask = ""
-        }
+        guard !newSubtask.isEmpty else { return }
+        let subtask = DBSubtask(id: UUID().uuidString, name: newSubtask, isCompleted: false)
+        onAddSubtask(subtask)
+        newSubtask = ""
     }
 }
 

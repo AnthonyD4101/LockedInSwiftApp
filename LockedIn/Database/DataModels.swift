@@ -24,7 +24,7 @@ struct DBTask: Identifiable, Codable {
     var subtasks: [DBSubtask]?
 }
 
-struct DBSubtask: Identifiable, Codable {
+struct DBSubtask: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
     var name: String
     var isCompleted: Bool

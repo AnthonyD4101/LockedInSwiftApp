@@ -34,7 +34,7 @@ struct AddCommunityTaskView: View {
                 
                 // TODO: REMOVE LATER
                 //SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
-                SubtasksView(subtasks: $dbSubtasks, newSubtask: $newSubtask)
+                TestSubtasksView(subtasks: $dbSubtasks, newSubtask: $newSubtask)
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -85,6 +85,62 @@ struct AddCommunityTaskView: View {
                 subtasks = []
                 messageOpacity = 0.0
             }
+        }
+    }
+}
+
+struct TestSubtasksView: View {
+    @Binding var subtasks: [DBSubtask]
+    @Binding var newSubtask: String
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
+
+            ForEach(subtasks) { subtask in
+                HStack {
+                    Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(.white)
+                        .onTapGesture {
+                            if let index = subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                                subtasks[index].isCompleted.toggle()
+                            }
+                        }
+
+                    Text(subtask.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Spacer()
+                }
+                .padding()
+            }
+
+            HStack {
+                TextField("Enter subtask", text: $newSubtask)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+
+                Button(action: {
+                    addSubtask()
+                }) {
+                    Text("Add")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.red)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private func addSubtask() {
+        if !newSubtask.isEmpty {
+            let subtask = DBSubtask(id: nil, name: newSubtask, isCompleted: false)
+            subtasks.append(subtask)
+            newSubtask = ""
         }
     }
 }

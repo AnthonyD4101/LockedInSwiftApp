@@ -73,10 +73,9 @@ struct TaskDetailsView: View {
     }
 
     // MARK: - Helper Functions
-
     private func loadSubtasks() {
         if let savedSubtasks = task.subtasks {
-            subtasks = savedSubtasks
+            subtasks = Array(Set(savedSubtasks))
         }
         isLoading = false
     }
@@ -148,8 +147,6 @@ struct SubtasksListView: View {
     @ObservedObject var dbTaskViewModel: DBTaskViewModel
     var userId: String
 
-    @State private var newSubtaskName: String = ""
-
     var body: some View {
         VStack(alignment: .leading) {
             Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
@@ -157,17 +154,17 @@ struct SubtasksListView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal)
 
-            ForEach($subtasks) { $subtask in
+            ForEach(subtasks.indices, id: \.self) { index in
                 HStack {
                     Button(action: {
-                        subtask.isCompleted.toggle()
+                        subtasks[index].isCompleted.toggle()
                         updateSubtasks()
                     }) {
-                        Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                        Image(systemName: subtasks[index].isCompleted ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(.white)
                     }
 
-                    Text(subtask.name)
+                    Text(subtasks[index].name)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
 
@@ -177,31 +174,7 @@ struct SubtasksListView: View {
                 .background(Color(red: 32 / 255, green: 33 / 255, blue: 33 / 255))
                 .cornerRadius(8)
             }
-
-            HStack {
-                TextField("Enter new subtask", text: $newSubtaskName)
-                    .font(.system(size: 16, weight: .bold))
-                    .padding()
-                    .background(Color(red: 32 / 255, green: 33 / 255, blue: 33 / 255))
-                    .cornerRadius(8)
-                    .foregroundColor(.white)
-
-                Button(action: addSubtask) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.blue)
-                        .font(.title2)
-                }
-            }
-            .padding()
         }
-    }
-
-    private func addSubtask() {
-        guard !newSubtaskName.isEmpty else { return }
-        let newSubtask = DBSubtask(id: UUID().uuidString, name: newSubtaskName, isCompleted: false)
-        subtasks.append(newSubtask)
-        updateSubtasks()
-        newSubtaskName = ""
     }
 
     private func updateSubtasks() {
