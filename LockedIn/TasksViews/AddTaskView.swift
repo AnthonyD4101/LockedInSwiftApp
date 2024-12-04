@@ -9,6 +9,7 @@ import SwiftUI
 
 // MARK: - Add Task View
 struct AddTaskView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var dbTaskViewModel: DBTaskViewModel
     var userId: String
     
@@ -50,24 +51,20 @@ struct AddTaskView: View {
                 }
                 
                 Spacer()
-                
-                Button(action: {
-                    createTask()
-                }) {
-                    Text("Create Task")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.black)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red)
-                        .cornerRadius(25)
-                        .padding(.horizontal)
-                }
             }
             .padding(.top)
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationTitle("Add Task")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    dismiss()
+                },
+                trailing: Button("Done") {
+                    createTask()
+                    dismiss()
+                }
+            )
             .onDisappear {
                 resetForm()
             }
