@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject var userViewModel: UserViewModel
-    @EnvironmentObject var taskViewModel: TaskViewModel
+    @EnvironmentObject var dbUserViewModel: DBUserViewModel
+    @EnvironmentObject var dbTaskViewModel: DBTaskViewModel
     @Environment(\.horizontalSizeClass) var widthSizeClass
     @Environment(\.verticalSizeClass) var heightSizeClass
     
@@ -36,7 +36,7 @@ struct ProfileView: View {
                         .padding(.top, 40)
                     
                     // Welcome Message
-                    if let username = userViewModel.currentUser?.username {
+                    if let username = dbUserViewModel.currentUser?.username {
                         Text("Welcome, \(username)!")
                             .foregroundColor(.white)
                             .font(.system(size: 24))
@@ -54,8 +54,8 @@ struct ProfileView: View {
                     if isLandscape {
                         HStack(spacing: 24) {
                             NavigationLink(destination: SettingsView()
-                                .environmentObject(userViewModel)
-                                .environmentObject(taskViewModel)
+                                .environmentObject(dbUserViewModel)
+                                .environmentObject(dbTaskViewModel)
                             ) {
                                 Text("User Settings")
                                     .font(.system(size: 18))
@@ -71,8 +71,8 @@ struct ProfileView: View {
                             }
                             
                             NavigationLink(destination: StatisticsView()
-                                .environmentObject(userViewModel)
-                                .environmentObject(taskViewModel)
+                                .environmentObject(dbUserViewModel)
+                                .environmentObject(dbTaskViewModel)
                             ) {
                                 Text("App Statistics")
                                     .font(.system(size: 18))
@@ -92,8 +92,8 @@ struct ProfileView: View {
                     else{
                         VStack(spacing: 24) {
                             NavigationLink(destination: SettingsView()
-                                .environmentObject(userViewModel)
-                                .environmentObject(taskViewModel)
+                                .environmentObject(dbUserViewModel)
+                                .environmentObject(dbTaskViewModel)
                             ) {
                                 Text("User Settings")
                                     .font(.system(size: 18))
@@ -109,8 +109,8 @@ struct ProfileView: View {
                             }
                             
                             NavigationLink(destination: StatisticsView()
-                                .environmentObject(userViewModel)
-                                .environmentObject(taskViewModel)
+                                .environmentObject(dbUserViewModel)
+                                .environmentObject(dbTaskViewModel)
                             ) {
                                 Text("App Statistics")
                                     .font(.system(size: 18))
@@ -136,10 +136,18 @@ struct ProfileView: View {
 }
 
 #Preview {
-    let userViewModel = UserViewModel()
-    let taskViewModel = TaskViewModel()
-    
-    ProfileView()
-        .environmentObject(userViewModel)
-        .environmentObject(taskViewModel)
+    let dbUserViewModel = DBUserViewModel()
+    let dbTaskViewModel = DBTaskViewModel()
+
+    // Mock user for preview
+    dbUserViewModel.currentUser = DBUser(
+        id: "testUserId",
+        email: "test@example.com",
+        username: "TestUser",
+        password: "password123"
+    )
+
+    return ProfileView()
+        .environmentObject(dbUserViewModel)
+        .environmentObject(dbTaskViewModel)
 }

@@ -12,7 +12,8 @@
 import SwiftUI
 
 struct StatisticsView: View {
-    @EnvironmentObject var taskViewModel: TaskViewModel
+    @EnvironmentObject var dbTaskViewModel: DBTaskViewModel
+    
     @Environment(\.horizontalSizeClass) var widthSizeClass
     @Environment(\.verticalSizeClass) var heightSizeClass
     
@@ -49,10 +50,10 @@ struct StatisticsView: View {
                     
                     // Statistics Data
                     VStack(alignment: .leading, spacing: 16) {
-                        StatisticRow(title: "Total Tasks", value: "\(taskViewModel.totalTasks)")
-                        StatisticRow(title: "Completed Tasks", value: "\(taskViewModel.completedTasks)")
-                        StatisticRow(title: "Total Subtasks", value: "\(taskViewModel.totalSubtasks)")
-                        StatisticRow(title: "Completed Subtasks", value: "\(taskViewModel.completedSubtasks)")
+                        StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
+                        StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
+                        StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
+                        StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
                     }
                     .padding(.horizontal, 16)
                     
@@ -80,10 +81,10 @@ struct StatisticsView: View {
                     
                     // Statistics Data
                     VStack(alignment: .leading, spacing: 16) {
-                        StatisticRow(title: "Total Tasks", value: "\(taskViewModel.totalTasks)")
-                        StatisticRow(title: "Completed Tasks", value: "\(taskViewModel.completedTasks)")
-                        StatisticRow(title: "Total Subtasks", value: "\(taskViewModel.totalSubtasks)")
-                        StatisticRow(title: "Completed Subtasks", value: "\(taskViewModel.completedSubtasks)")
+                        StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
+                        StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
+                        StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
+                        StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
                     }
                     .padding(.horizontal, 16)
                     

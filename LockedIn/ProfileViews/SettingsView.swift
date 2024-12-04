@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var dbUserViewModel: DBUserViewModel
     
     @State private var newEmail: String = ""
     @State private var newUsername: String = ""
@@ -17,7 +17,9 @@ struct SettingsView: View {
     @State private var confirmPassword: String = ""
     @State private var showPasswordChangeAlert: Bool = false
     @State private var showInfoChangeAlert: Bool = false
-    @State private var passwordChangeSuccess: Bool = false
+    @State private var passwordChangeMessage: String = ""
+    @State private var infoChangeMessage: String = ""
+    
     @Environment(\.horizontalSizeClass) var widthSizeClass
     @Environment(\.verticalSizeClass) var heightSizeClass
     
@@ -74,9 +76,17 @@ struct SettingsView: View {
                         
                         // Save Changes Button
                         Button(action: {
-                            userViewModel.updateEmail(newEmail: newEmail)
-                            userViewModel.updateUsername(newUsername: newUsername)
-                            showInfoChangeAlert = true
+                            Task {
+                                if !newEmail.isEmpty {
+                                    await dbUserViewModel.updateEmail(newEmail: newEmail)
+                                    infoChangeMessage += "Email updated successfully.\n"
+                                }
+                                if !newUsername.isEmpty {
+                                    await dbUserViewModel.updateUsername(newUsername: newUsername)
+                                    infoChangeMessage += "Username updated successfully."
+                                }
+                                showInfoChangeAlert = true
+                            }
                         }) {
                             Text("Save Changes")
                                 .font(.system(size: 18))
@@ -130,9 +140,13 @@ struct SettingsView: View {
                         
                         // Change Password Button
                         Button(action: {
-                            if newPassword == confirmPassword {
-                                passwordChangeSuccess = userViewModel.updatePassword(currentPassword: currentPassword, newPassword: newPassword)
-                            } else {
+                            Task {
+                                if newPassword == confirmPassword {
+                                    await dbUserViewModel.updatePassword(newPassword: newPassword)
+                                    passwordChangeMessage = "Password updated successfully."
+                                } else {
+                                    passwordChangeMessage = "New password and confirmation do not match."
+                                }
                                 showPasswordChangeAlert = true
                             }
                         }) {
@@ -150,10 +164,7 @@ struct SettingsView: View {
                         }
                         .padding(.top, 10)
                         .alert(isPresented: $showPasswordChangeAlert) {
-                            Alert(title: Text("Password Mismatch"), message: Text("New password and confirmation do not match."), dismissButton: .default(Text("OK")))
-                        }
-                        .alert(isPresented: $passwordChangeSuccess) {
-                            Alert(title: Text("Password Change Success"), message: Text("Your password has been successfully changed."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Password Update"), message: Text(passwordChangeMessage), dismissButton: .default(Text("OK")))
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -205,9 +216,17 @@ struct SettingsView: View {
                         
                         // Save Changes Button
                         Button(action: {
-                            userViewModel.updateEmail(newEmail: newEmail)
-                            userViewModel.updateUsername(newUsername: newUsername)
-                            showInfoChangeAlert = true
+                            Task {
+                                if !newEmail.isEmpty {
+                                    await dbUserViewModel.updateEmail(newEmail: newEmail)
+                                    infoChangeMessage += "Email updated successfully.\n"
+                                }
+                                if !newUsername.isEmpty {
+                                    await dbUserViewModel.updateUsername(newUsername: newUsername)
+                                    infoChangeMessage += "Username updated successfully."
+                                }
+                                showInfoChangeAlert = true
+                            }
                         }) {
                             Text("Save Changes")
                                 .font(.system(size: 18))
@@ -251,9 +270,13 @@ struct SettingsView: View {
                         
                         // Change Password Button
                         Button(action: {
-                            if newPassword == confirmPassword {
-                                passwordChangeSuccess = userViewModel.updatePassword(currentPassword: currentPassword, newPassword: newPassword)
-                            } else {
+                            Task {
+                                if newPassword == confirmPassword {
+                                    await dbUserViewModel.updatePassword(newPassword: newPassword)
+                                    passwordChangeMessage = "Password updated successfully."
+                                } else {
+                                    passwordChangeMessage = "New password and confirmation do not match."
+                                }
                                 showPasswordChangeAlert = true
                             }
                         }) {
@@ -270,10 +293,7 @@ struct SettingsView: View {
                                 .cornerRadius(8)
                         }
                         .alert(isPresented: $showPasswordChangeAlert) {
-                            Alert(title: Text("Password Mismatch"), message: Text("New password and confirmation do not match."), dismissButton: .default(Text("OK")))
-                        }
-                        .alert(isPresented: $passwordChangeSuccess) {
-                            Alert(title: Text("Password Change Success"), message: Text("Your password has been successfully changed."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Password Update"), message: Text(passwordChangeMessage), dismissButton: .default(Text("OK")))
                         }
                     }
                     .padding(.horizontal, 40)
@@ -286,9 +306,8 @@ struct SettingsView: View {
 // MARK: - Preview
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        let userViewModel = UserViewModel()
-        
+        let dbUserViewModel = DBUserViewModel()
         SettingsView()
-            .environmentObject(userViewModel)
+            .environmentObject(dbUserViewModel)
     }
 }

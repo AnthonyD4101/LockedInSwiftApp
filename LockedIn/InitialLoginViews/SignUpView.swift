@@ -12,7 +12,7 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var dbUserViewModel: DBUserViewModel
     @State private var userEmail: String = ""
     @State private var username: String = ""
     @State private var userCreatePassword: String = ""
@@ -21,17 +21,17 @@ struct SignUpView: View {
     @State private var alertMessage: String = ""
     @Environment(\.horizontalSizeClass) var widthSizeClass
     @Environment(\.verticalSizeClass) var heightSizeClass
-
+    
     var body: some View {
         let orientation = DeviceOrientation(
             widthSizeClass: widthSizeClass,
             heightSizeClass: heightSizeClass
         )
-
+        
         ZStack {
             Color(.black)
                 .edgesIgnoringSafeArea(.all)
-
+            
             VStack {
                 Text("Create your account!")
                     .foregroundColor(.white)
@@ -40,8 +40,8 @@ struct SignUpView: View {
                     .underline()
                     .padding(.top, 30)
                     .padding(.bottom, 30)
-
-
+                
+                
                 if orientation.isLandscape(device: .iPadFull) ||
                     orientation.isLandscape(device: .iPhone) ||
                     orientation.isLandscape(device: .iPhonePlusOrMax) {
@@ -52,7 +52,7 @@ struct SignUpView: View {
                             UserTextField(title: "Username", text: $username)
                         }
                         .frame(maxWidth: 300)
-
+                        
                         VStack(spacing: 16) {
                             UserTextField(title: "Create Password", text: $userCreatePassword)
                             UserTextField(title: "Confirm Password", text: $userConfirmPassword)
@@ -68,7 +68,7 @@ struct SignUpView: View {
                     }
                     .padding(.horizontal, 40)
                 }
-
+                
                 // Sign-Up Button
                 Button(action: {
                     handleSignUp()
@@ -93,7 +93,7 @@ struct SignUpView: View {
             }
         }
     }
-
+    
     // MARK: - Sign-Up Handling
     private func handleSignUp() {
         guard userCreatePassword == userConfirmPassword else {
@@ -101,15 +101,18 @@ struct SignUpView: View {
             showAlert = true
             return
         }
-
-        let success = userViewModel.signUp(email: userEmail, username: username, password: userCreatePassword)
-
-        if success {
-            alertMessage = "Sign-up successful!"
-            showAlert = true
-        } else {
-            alertMessage = "Email or username already exists"
-            showAlert = true
+        
+        Task {
+            let success = await dbUserViewModel.signUp(email: userEmail, username: username, password: userCreatePassword)
+            
+            if success {
+                alertMessage = "Sign-up successful!"
+                showAlert = true
+                // TODO: Navigate to the correct view after sign-up
+            } else {
+                alertMessage = "Error during sign-up. Please try again."
+                showAlert = true
+            }
         }
     }
 }
@@ -118,14 +121,14 @@ struct SignUpView: View {
 struct UserTextField: View {
     var title: String
     @Binding var text: String
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .foregroundColor(.white)
                 .font(.system(size: 18))
                 .bold()
-
+            
             TextField("", text: $text)
                 .padding()
                 .background(Color(red: 32/255, green: 33/255, blue: 33/255))
@@ -141,14 +144,14 @@ struct UserTextField: View {
 struct UserSecureField: View {
     var title: String
     @Binding var text: String
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .foregroundColor(.white)
                 .font(.system(size: 18))
                 .bold()
-
+            
             SecureField("", text: $text)
                 .padding()
                 .background(Color(red: 32/255, green: 33/255, blue: 33/255))
@@ -164,9 +167,9 @@ struct UserSecureField: View {
 // MARK: - Preview
 struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
-        let userViewModel = UserViewModel()
-
+        let dbUserViewModel = DBUserViewModel()
+        
         SignUpView()
-            .environmentObject(userViewModel)
+            .environmentObject(dbUserViewModel)
     }
 }

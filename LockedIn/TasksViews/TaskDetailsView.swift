@@ -7,19 +7,20 @@
 
 import SwiftUI
 
-// TODO: Add "Complete Task" Functionality
-// If a user checks off all subtasks, a "Complete Task" button shows up
-// A user should be able to click this button, which in return will remove
-// said task from the task list
-
 // MARK: - Task Details View
 struct TaskDetailsView: View {
-    @Binding var task: Task
-    @State private var subtasks: [Subtask]
+    @ObservedObject var dbTaskViewModel: DBTaskViewModel
+    var userId: String
     
-    init(task: Binding<Task>) {
+    @Binding var task: DBTask
+    @State private var subtasks: [DBSubtask] = []
+    //@State private var isLoading = true
+    
+    init(task: Binding<DBTask>, dbTaskViewModel: DBTaskViewModel, userId: String) {
         self._task = task
-        self._subtasks = State(initialValue: task.wrappedValue.subtasks)
+        self.dbTaskViewModel = dbTaskViewModel
+        self.userId = userId
+        self._subtasks = State(initialValue: task.wrappedValue.subtasks ?? [])
     }
     
     var body: some View {
@@ -33,13 +34,18 @@ struct TaskDetailsView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksListView(subtasks: $subtasks)
+                SubtasksListView(
+                    subtasks: $subtasks,
+                    task: $task,
+                    dbTaskViewModel: dbTaskViewModel,
+                    userId: userId
+                )
                 
                 if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
                     HStack {
                         Spacer()
                         CompleteTaskButton {
-                            print("Task completed!")
+                            markTaskAsCompleted()
                         }
                         Spacer()
                     }
@@ -52,9 +58,32 @@ struct TaskDetailsView: View {
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
-            .onDisappear {
-                task.subtasks = subtasks
+            .onAppear {
+                loadSubtasks()
             }
+            .onDisappear {
+                saveSubtasks()
+            }
+        }
+    }
+    
+    private func loadSubtasks() {
+        if let savedSubtasks = task.subtasks {
+            subtasks = Array(Set(savedSubtasks))
+        }
+    }
+    
+    private func saveSubtasks() {
+        task.subtasks = subtasks
+        Task {
+            await dbTaskViewModel.updateTask(for: userId, task: task)
+        }
+    }
+    
+    private func markTaskAsCompleted() {
+        task.isCompleted = true
+        Task {
+            await dbTaskViewModel.updateTask(for: userId, task: task)
         }
     }
 }
@@ -109,7 +138,10 @@ struct TaskDueDateView: View {
 
 // MARK: - Subtasks List View
 struct SubtasksListView: View {
-    @Binding var subtasks: [Subtask]
+    @Binding var subtasks: [DBSubtask]
+    @Binding var task: DBTask
+    @ObservedObject var dbTaskViewModel: DBTaskViewModel
+    var userId: String
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -118,16 +150,17 @@ struct SubtasksListView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal)
             
-            ForEach($subtasks) { $subtask in
+            ForEach(subtasks.indices, id: \.self) { index in
                 HStack {
                     Button(action: {
-                        subtask.isCompleted.toggle()
+                        subtasks[index].isCompleted.toggle()
+                        updateSubtasks()
                     }) {
-                        Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                        Image(systemName: subtasks[index].isCompleted ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(.white)
                     }
                     
-                    Text(subtask.name)
+                    Text(subtasks[index].name)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                     
@@ -135,6 +168,13 @@ struct SubtasksListView: View {
                 }
                 .padding()
             }
+        }
+    }
+    
+    private func updateSubtasks() {
+        task.subtasks = subtasks
+        Task {
+            await dbTaskViewModel.updateTask(for: userId, task: task)
         }
     }
 }
@@ -153,18 +193,5 @@ struct CompleteTaskButton: View {
                 .foregroundColor(.black)
                 .cornerRadius(20)
         }
-    }
-}
-
-// MARK: - Preview
-struct TaskDetailsView_Preview: PreviewProvider {
-    @State static var task = Task(name: "Sample Task",
-                                  description: "This is a sample task.",
-                                  date: Date(),
-                                  subtasks: [Subtask(name: "Subtask 1", isCompleted: false),
-                                             Subtask(name: "Subtask 2", isCompleted: false)])
-    
-    static var previews: some View {
-        TaskDetailsView(task: $task)
     }
 }

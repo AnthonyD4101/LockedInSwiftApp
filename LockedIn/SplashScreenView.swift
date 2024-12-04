@@ -6,10 +6,12 @@
 //
 
 import Foundation
-
 import SwiftUI
 
 struct SplashScreenView: View {
+    @StateObject private var dbUserViewModel = DBUserViewModel()
+    @StateObject private var dbTaskViewModel = DBTaskViewModel()
+    
     @State var isActive : Bool = false
     @State private var size = 0.8
     @State private var opacity = 0.5
@@ -17,6 +19,8 @@ struct SplashScreenView: View {
     var body: some View {
         if isActive {
             ContentView()
+                .environmentObject(dbUserViewModel)
+                .environmentObject(dbTaskViewModel)
         } else {
             VStack {
                 Image("LockedInLogo")

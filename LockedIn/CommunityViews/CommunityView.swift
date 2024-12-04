@@ -13,7 +13,7 @@ struct CommunityData {
             name: "COSC4355",
             imageName: "swift",
             tasks: [
-                Task(
+                UserTask(
                     name: "Beta App",
                     description: "Views for Beta App",
                     date: Date().addingTimeInterval(86400 * 3),
@@ -24,7 +24,7 @@ struct CommunityData {
                     ],
                     isCompleted: false
                 ),
-                Task(
+                UserTask(
                     name: "App Specification 2",
                     description: "Fix App Specification to get points back",
                     date: Date().addingTimeInterval(86400 * 5),
@@ -51,7 +51,7 @@ struct CommunityData {
             name: "COSC4355",
             imageName: "swift",
             tasks: [
-                Task(
+                UserTask(
                     name: "Beta App",
                     description: "Views for Beta App",
                     date: Date().addingTimeInterval(86400 * 3),
@@ -62,7 +62,7 @@ struct CommunityData {
                     ],
                     isCompleted: false
                 ),
-                Task(
+                UserTask(
                     name: "App Specification 2",
                     description: "Fix App Specification to get points back",
                     date: Date().addingTimeInterval(86400 * 5),
@@ -89,7 +89,7 @@ struct CommunityData {
             name: "COSC4355",
             imageName: "swift",
             tasks: [
-                Task(
+                UserTask(
                     name: "Beta App",
                     description: "Views for Beta App",
                     date: Date().addingTimeInterval(86400 * 3),
@@ -100,7 +100,7 @@ struct CommunityData {
                     ],
                     isCompleted: false
                 ),
-                Task(
+                UserTask(
                     name: "App Specification 2",
                     description: "Fix App Specification to get points back",
                     date: Date().addingTimeInterval(86400 * 5),

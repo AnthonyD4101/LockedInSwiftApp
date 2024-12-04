@@ -9,12 +9,14 @@ import SwiftUI
 
 // MARK: - Add Task View
 struct AddTaskView: View {
-    @ObservedObject var taskViewModel: TaskViewModel
-    @State private var newTask: String = ""
+    @ObservedObject var dbTaskViewModel: DBTaskViewModel
+    var userId: String
+    
+    @State private var newTaskName: String = ""
     @State private var taskDescription: String = ""
     @State private var taskDate = Date()
-    @State private var subtasks: [Subtask] = []
-    @State private var newSubtask: String = ""
+    @State private var subtasks: [DBSubtask] = []
+    @State private var newSubtaskName: String = ""
     
     @State private var showSuccessMessage: Bool = false
     @State private var messageOpacity: Double = 0.0
@@ -22,7 +24,7 @@ struct AddTaskView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 16) {
-                TaskNameInput(taskName: $newTask)
+                TaskNameInput(taskName: $newTaskName)
                 TaskDescriptionInput(taskDescription: $taskDescription)
                 TaskDatePicker(taskDate: $taskDate)
                 
@@ -30,7 +32,13 @@ struct AddTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
+                SubtasksView(
+                    subtasks: $subtasks,
+                    newSubtask: $newSubtaskName,
+                    onAddSubtask: { subtask in
+                        subtasks.append(subtask)
+                    }
+                )
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -44,21 +52,7 @@ struct AddTaskView: View {
                 Spacer()
                 
                 Button(action: {
-                    if !newTask.isEmpty {
-                        _ = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
-                        taskViewModel.addTask(title: newTask, description: taskDescription, dueDate: taskDate, subtasks: subtasks)
-                        newTask = ""
-                        taskDescription = ""
-                        taskDate = Date()
-                        subtasks = []
-                        showSuccessMessage = true
-                        messageOpacity = 1.0
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation {
-                                messageOpacity = 0.0
-                            }
-                        }
-                    }
+                    createTask()
                 }) {
                     Text("Create Task")
                         .font(.system(size: 18, weight: .bold))
@@ -75,14 +69,54 @@ struct AddTaskView: View {
             .navigationTitle("Add Task")
             .navigationBarTitleDisplayMode(.inline)
             .onDisappear {
-                newTask = ""
-                taskDescription = ""
-                taskDate = Date()
-                subtasks = []
-                messageOpacity = 0.0
+                resetForm()
             }
         }
     }
+    
+    private func createTask() {
+            guard !newTaskName.isEmpty else { return }
+
+            var newTask = DBTask(
+                id: nil,
+                name: newTaskName,
+                description: taskDescription,
+                date: taskDate,
+                isCompleted: false,
+                subtasks: subtasks
+            )
+
+            Task {
+                await dbTaskViewModel.addTask(for: userId, task: newTask)
+
+                // Fetch the task just added to ensure we have its Firestore-assigned ID
+                await dbTaskViewModel.fetchTasks(for: userId)
+
+                if let addedTask = dbTaskViewModel.tasks.first(where: { $0.name == newTaskName && $0.date == taskDate }) {
+                    for subtask in subtasks {
+                        await dbTaskViewModel.addSubtask(to: addedTask, subtask: subtask, for: userId)
+                    }
+                }
+
+                resetForm()
+                showSuccessMessage = true
+                messageOpacity = 1.0
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation {
+                        messageOpacity = 0.0
+                    }
+                }
+            }
+        }
+
+        private func resetForm() {
+            newTaskName = ""
+            taskDescription = ""
+            taskDate = Date()
+            subtasks = []
+            messageOpacity = 0.0
+        }
 }
 
 
@@ -152,8 +186,9 @@ struct TaskDatePicker: View {
 
 // MARK: - Subtasks View
 struct SubtasksView: View {
-    @Binding var subtasks: [Subtask]
-    @Binding var newSubtask: String // New subtask input binding
+    @Binding var subtasks: [DBSubtask]
+    @Binding var newSubtask: String
+    var onAddSubtask: (DBSubtask) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -189,11 +224,7 @@ struct SubtasksView: View {
                     .disableAutocorrection(true)
                 
                 Button(action: {
-                    if !newSubtask.isEmpty {
-                        let subtask = Subtask(name: newSubtask)
-                        subtasks.append(subtask)
-                        newSubtask = ""
-                    }
+                    addSubtask()
                 }) {
                     Text("Add")
                         .font(.system(size: 18, weight: .bold))
@@ -203,15 +234,22 @@ struct SubtasksView: View {
             .padding()
         }
     }
+    
+    private func addSubtask() {
+            guard !newSubtask.isEmpty else { return }
+            let subtask = DBSubtask(id: UUID().uuidString, name: newSubtask, isCompleted: false)
+            onAddSubtask(subtask)
+            newSubtask = ""
+        }
 }
 
 
-// MARK: - Preview
+// MARK: Preview
 struct AddTaskViewPreview: View {
-    @State private var taskViewModel = TaskViewModel()
-    
+    @StateObject private var dbTaskViewModel = DBTaskViewModel()
+
     var body: some View {
-        AddTaskView(taskViewModel: taskViewModel)
+        AddTaskView(dbTaskViewModel: dbTaskViewModel, userId: "exampleUserId")
     }
 }
 

@@ -29,7 +29,7 @@ struct AddCommunityTaskView: View {
                     .background(Color.white)
                     .padding(.horizontal)
                 
-                SubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
+                OLDSubtasksView(subtasks: $subtasks, newSubtask: $newSubtask)
                 
                 if showSuccessMessage {
                     Text("Task created successfully!")
@@ -44,7 +44,7 @@ struct AddCommunityTaskView: View {
                 
                 Button(action: {
                     if !newTask.isEmpty {
-                        let task = Task(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
+                        let task = UserTask(name: newTask, description: taskDescription, date: taskDate, subtasks: subtasks)
                         community.tasks.append(task)
                         newTask = ""
                         taskDescription = ""
@@ -80,6 +80,59 @@ struct AddCommunityTaskView: View {
                 subtasks = []
                 messageOpacity = 0.0
             }
+        }
+    }
+}
+
+// FOR TESTING ONLY, CHANGE LATER
+struct OLDSubtasksView: View {
+    @Binding var subtasks: [Subtask]
+    @Binding var newSubtask: String // New subtask input binding
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
+            
+            ForEach(subtasks) { subtask in
+                HStack {
+                    Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(.white)
+                        .onTapGesture {
+                            if let index = subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                                subtasks[index].isCompleted.toggle()
+                            }
+                        }
+                    
+                    Text(subtask.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                }
+                .padding()
+            }
+            
+            HStack {
+                TextField("Enter subtask", text: $newSubtask)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Button(action: {
+                    if !newSubtask.isEmpty {
+                        let subtask = Subtask(name: newSubtask)
+                        subtasks.append(subtask)
+                        newSubtask = ""
+                    }
+                }) {
+                    Text("Add")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.red)
+                }
+            }
+            .padding()
         }
     }
 }

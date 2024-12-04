@@ -14,7 +14,7 @@ struct CommunityDetailView: View {
     @State private var showAddTaskView = false
     @State private var showAddResourceView = false
     @State private var showAddDescriptionView = false
-    @State private var selectedTask: Task?
+    @State private var selectedTask: UserTask?
     @State private var selectedTab = 0
     
     @ObservedObject var taskViewModel: TaskViewModel
@@ -106,7 +106,7 @@ struct CommunityDetailView: View {
                                     Button(action: {
                                         selectedTask = task
                                     }) {
-                                        TaskRowView(task: $task, onComplete: {})
+                                        OLDTaskRowView(task: $task, onComplete: {})
                                             .padding(.horizontal)
                                             .cornerRadius(10)
                                     }
@@ -204,10 +204,131 @@ struct CommunityDetailView: View {
             }
             .sheet(item: $selectedTask) { selectedTask in
                 if let index = taskViewModel.tasks.firstIndex(where: { $0.id == selectedTask.id }) {
-                    TaskDetailsView(task: $taskViewModel.tasks[index])
+                    OLDTaskDetailsView(task: $taskViewModel.tasks[index])
                 }
             }
         }
     }
 }
 
+// FOR TESTING ONLY, CHANGE LATER
+struct OLDTaskDetailsView: View {
+    @Binding var task: UserTask
+    @State private var subtasks: [Subtask]
+    
+    init(task: Binding<UserTask>) {
+        self._task = task
+        self._subtasks = State(initialValue: task.wrappedValue.subtasks)
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                TaskNameView(name: task.name)
+                TaskDescriptionView(description: task.description)
+                TaskDueDateView(date: task.date)
+                
+                Divider()
+                    .background(Color.white)
+                    .padding(.horizontal)
+                
+                OLDSubtasksListView(subtasks: $subtasks)
+                
+                if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
+                    HStack {
+                        Spacer()
+                        CompleteTaskButton {
+                            print("Task completed!")
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
+                }
+                
+                Spacer()
+            }
+            .padding(.top)
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .navigationTitle("Task Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .onDisappear {
+                task.subtasks = subtasks
+            }
+        }
+    }
+}
+
+// FOR TESTING ONLY, CHANGE LATER
+struct OLDTaskRowView: View {
+    @Binding var task: UserTask
+    var onComplete: () -> Void
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            Button(action: {
+                withAnimation {
+                    task.isCompleted.toggle()
+                    if task.isCompleted {
+                        onComplete()
+                    }
+                }
+            }) {
+                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(task.isCompleted ? .red : .white)
+                    .font(.system(size: 20))
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text(task.name)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+                
+                if !task.description.isEmpty {
+                    Text(task.description)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.red)
+            }
+            
+            Spacer()
+        }
+        .background(task.isCompleted ? Color.black.opacity(0.3) : Color.clear)
+        .cornerRadius(10)
+    }
+}
+
+// FOR TESTING ONLY, CHANGE LATER
+struct OLDSubtasksListView: View {
+    @Binding var subtasks: [Subtask]
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
+            
+            ForEach($subtasks) { $subtask in
+                HStack {
+                    Button(action: {
+                        subtask.isCompleted.toggle()
+                    }) {
+                        Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(.white)
+                    }
+                    
+                    Text(subtask.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                }
+                .padding()
+            }
+        }
+    }
+}

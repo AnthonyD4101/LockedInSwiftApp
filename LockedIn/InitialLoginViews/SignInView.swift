@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignInView: View {
-    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var dbUserViewModel: DBUserViewModel
     @Binding var isSignedIn: Bool
     @State private var username: String = ""
     @State private var userPassword: String = ""
@@ -123,10 +123,13 @@ struct SignInView: View {
             }
             
             Button(action: {
-                if userViewModel.logIn(email: username, password: userPassword) {
-                    isSignedIn = true
-                } else {
-                    loginFailed = true
+                Task {
+                    let success = await dbUserViewModel.logIn(email: username, password: userPassword)
+                    if success {
+                        isSignedIn = true
+                    } else {
+                        loginFailed = true
+                    }
                 }
             }) {
                 Text("Sign In")
@@ -150,7 +153,7 @@ struct SignInView: View {
                     .font(.system(size: 18))
                     .bold()
                 
-                NavigationLink(destination: SignUpView().environmentObject(userViewModel)) {
+                NavigationLink(destination: SignUpView().environmentObject(dbUserViewModel)) {
                     Text("Sign Up")
                         .gradientForeground(colors: [.cyan, .blue])
                         .font(.system(size: 18))
@@ -168,10 +171,10 @@ struct SignInView: View {
 // MARK: - Preview
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
-        let userViewModel = UserViewModel()
+        let dbUserViewModel = DBUserViewModel()
         
         SignInView(isSignedIn: .constant(false))
-            .environmentObject(userViewModel)
+            .environmentObject(dbUserViewModel)
     }
 }
 
