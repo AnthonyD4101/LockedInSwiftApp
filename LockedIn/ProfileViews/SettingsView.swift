@@ -266,6 +266,14 @@ struct SettingsView: View {
                                 .foregroundColor(.white)
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
+                            
+                            SecureField("Confirm New Password", text: $confirmPassword)
+                                .padding()
+                                .background(Color(red: 32/255, green: 33/255, blue: 33/255))
+                                .cornerRadius(8)
+                                .foregroundColor(.white)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
                         }
                         
                         // Change Password Button

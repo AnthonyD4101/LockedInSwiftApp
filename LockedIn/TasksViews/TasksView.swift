@@ -68,14 +68,14 @@ struct TasksView: View {
                     Spacer()
                 }
                 
+                Spacer()
+                
                 // Add Task Button
-                AddTaskButton(showAddTaskView: $showAddTaskView)
-                    .position(
-                        x: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
-                        UIScreen.main.bounds.width - 150 : UIScreen.main.bounds.width - 60,
-                        y: orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull) ?
-                        UIScreen.main.bounds.height - 100 : UIScreen.main.bounds.height - 200
-                    )
+                HStack {
+                    Spacer()
+                    AddTaskButton(showAddTaskView: $showAddTaskView)
+                        .padding(25)
+                }
             }
             .onAppear {
                 if let userId = dbUserViewModel.currentUser?.id {
