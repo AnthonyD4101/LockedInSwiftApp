@@ -237,7 +237,7 @@ struct OLDTaskDetailsView: View {
                 if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
                     HStack {
                         Spacer()
-                        CompleteTaskButton {
+                        CompleteTaskMarker {
                             print("Task completed!")
                         }
                         Spacer()
