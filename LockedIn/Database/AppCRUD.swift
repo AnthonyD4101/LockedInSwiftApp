@@ -84,20 +84,37 @@ class DBUserViewModel: ObservableObject {
         }
     }
     
-    func updatePassword(newPassword: String) async {
-        guard let currentUser = currentUser, let userId = currentUser.id else { return }
+    func updatePassword(currentPassword: String, newPassword: String, userId: String) async throws {
         do {
-            // Update Firestore data
+            // Fetch the current user document from Firestore
+            let userDocument = try await db.collection("users").document(userId).getDocument()
+            
+            guard let userData = userDocument.data(),
+                  let storedPassword = userData["password"] as? String else {
+                throw NSError(domain: "UpdatePassword", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch current password from database."])
+            }
+
+            // Check if the current password matches the stored password
+            if currentPassword != storedPassword {
+                throw NSError(domain: "UpdatePassword", code: 2, userInfo: [NSLocalizedDescriptionKey: "Current password is incorrect."])
+            }
+
+            // Update the password in Firestore
             try await db.collection("users").document(userId).updateData(["password": newPassword])
+            
+            // Optionally update the local model
             DispatchQueue.main.async {
                 self.currentUser?.password = newPassword
             }
-            print("Password updated successfully in Firestore.")
+
+            print("Password updated successfully.")
         } catch {
             print("Error updating password: \(error.localizedDescription)")
+            throw error
         }
     }
 
+    // TODO: IMPLEMENT WAY TO LOG OUT
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -164,7 +181,7 @@ class DBTaskViewModel: ObservableObject {
             var updatedTask = task
             updatedTask.subtasks = (task.subtasks ?? []) + [subtask]
             try await db.collection("users").document(userId).collection("tasks").document(taskId).setData(from: updatedTask)
-            await fetchTasks(for: userId) // Refresh tasks
+            await fetchTasks(for: userId)
         } catch {
             print("Error adding subtask: \(error.localizedDescription)")
         }
@@ -176,7 +193,7 @@ class DBTaskViewModel: ObservableObject {
             var updatedTask = task
             updatedTask.subtasks = task.subtasks?.filter { $0.id != subtaskId }
             try await db.collection("users").document(userId).collection("tasks").document(taskId).setData(from: updatedTask)
-            await fetchTasks(for: userId) // Refresh tasks
+            await fetchTasks(for: userId)
         } catch {
             print("Error removing subtask: \(error.localizedDescription)")
         }
