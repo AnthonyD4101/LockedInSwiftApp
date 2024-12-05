@@ -77,14 +77,24 @@ struct SettingsView: View {
                         // Save Changes Button
                         Button(action: {
                             Task {
+                                infoChangeMessage = ""
+                                
                                 if !newEmail.isEmpty {
                                     await dbUserViewModel.updateEmail(newEmail: newEmail)
                                     infoChangeMessage += "Email updated successfully.\n"
+                                    newEmail = ""
                                 }
+                                
                                 if !newUsername.isEmpty {
                                     await dbUserViewModel.updateUsername(newUsername: newUsername)
                                     infoChangeMessage += "Username updated successfully."
+                                    newUsername = ""
                                 }
+                                
+                                if infoChangeMessage.isEmpty {
+                                    infoChangeMessage = "No changes were made."
+                                }
+                                
                                 showInfoChangeAlert = true
                             }
                         }) {
@@ -101,7 +111,7 @@ struct SettingsView: View {
                                 .cornerRadius(8)
                         }
                         .alert(isPresented: $showInfoChangeAlert) {
-                            Alert(title: Text("Changes Saved"), message: Text("Your email and username have been updated successfully."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Changes Saved"), message: Text(infoChangeMessage), dismissButton: .default(Text("OK")))
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -217,14 +227,24 @@ struct SettingsView: View {
                         // Save Changes Button
                         Button(action: {
                             Task {
+                                infoChangeMessage = ""
+                                
                                 if !newEmail.isEmpty {
                                     await dbUserViewModel.updateEmail(newEmail: newEmail)
                                     infoChangeMessage += "Email updated successfully.\n"
+                                    newEmail = ""
                                 }
+                                
                                 if !newUsername.isEmpty {
                                     await dbUserViewModel.updateUsername(newUsername: newUsername)
                                     infoChangeMessage += "Username updated successfully."
+                                    newUsername = ""
                                 }
+                                
+                                if infoChangeMessage.isEmpty {
+                                    infoChangeMessage = "No changes were made."
+                                }
+                                
                                 showInfoChangeAlert = true
                             }
                         }) {
@@ -241,7 +261,7 @@ struct SettingsView: View {
                                 .cornerRadius(8)
                         }
                         .alert(isPresented: $showInfoChangeAlert) {
-                            Alert(title: Text("Changes Saved"), message: Text("Your email and username have been updated successfully."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Changes Saved"), message: Text(infoChangeMessage), dismissButton: .default(Text("OK")))
                         }
                         
                         // Change Password Section
