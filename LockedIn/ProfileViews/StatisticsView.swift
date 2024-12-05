@@ -70,7 +70,7 @@ struct StatisticsView: View {
                         .foregroundColor(.orange)
                         .padding(.top, 40)
                     
-                    Text("Information locked in, just for you!")
+                    Text("App statistics locked in, just for you!")
                         .foregroundColor(.white)
                         .font(.system(size: 28))
                         .bold()
