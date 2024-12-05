@@ -64,10 +64,10 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                                 .padding(.top, 24)
                             
-                            StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
-                            StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
-                            StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
-                            StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
+                            StatisticRow(title: "Total Tasks", value: "\(dbUserViewModel.currentUser?.statistics.totalTasks ?? 0)")
+                            StatisticRow(title: "Completed Tasks", value: "\(dbUserViewModel.currentUser?.statistics.completedTasks ?? 0)")
+                            StatisticRow(title: "Total Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.totalSubtasks ?? 0)")
+                            StatisticRow(title: "Completed Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.completedSubtasks ?? 0)")
                             
                             Spacer()
                                 .frame(height: 50)
@@ -158,10 +158,10 @@ struct ProfileView: View {
                                     .padding(.top, 16)
                                     .multilineTextAlignment(.center)
                                 
-                                StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
-                                StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
-                                StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
-                                StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
+                                StatisticRow(title: "Total Tasks", value: "\(dbUserViewModel.currentUser?.statistics.totalTasks ?? 0)")
+                                StatisticRow(title: "Completed Tasks", value: "\(dbUserViewModel.currentUser?.statistics.completedTasks ?? 0)")
+                                StatisticRow(title: "Total Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.totalSubtasks ?? 0)")
+                                StatisticRow(title: "Completed Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.completedSubtasks ?? 0)")
                             }
                             .padding(.horizontal, 20)
                             
@@ -220,22 +220,10 @@ struct ProfileView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                await dbUserViewModel.refreshStatistics()
+            }
+        }
     }
-}
-
-#Preview {
-    let dbUserViewModel = DBUserViewModel()
-    let dbTaskViewModel = DBTaskViewModel()
-    
-    // Mock user for preview
-    dbUserViewModel.currentUser = DBUser(
-        id: "testUserId",
-        email: "test@example.com",
-        username: "TestUser",
-        password: "password123"
-    )
-    
-    return ProfileView()
-        .environmentObject(dbUserViewModel)
-        .environmentObject(dbTaskViewModel)
 }
