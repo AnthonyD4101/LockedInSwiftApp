@@ -50,10 +50,10 @@ struct StatisticsView: View {
                     
                     // Statistics Data
                     VStack(alignment: .leading, spacing: 16) {
-                        StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
-                        StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
-                        StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
-                        StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
+                        //StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
+                        //StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
+                        //StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
+                        //StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
                     }
                     .padding(.horizontal, 16)
                     
@@ -70,7 +70,7 @@ struct StatisticsView: View {
                         .foregroundColor(.orange)
                         .padding(.top, 40)
                     
-                    Text("Information locked in, just for you!")
+                    Text("App statistics locked in, just for you!")
                         .foregroundColor(.white)
                         .font(.system(size: 28))
                         .bold()
@@ -81,10 +81,10 @@ struct StatisticsView: View {
                     
                     // Statistics Data
                     VStack(alignment: .leading, spacing: 16) {
-                        StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
-                        StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
-                        StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
-                        StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
+                        //StatisticRow(title: "Total Tasks", value: "\(dbTaskViewModel.totalTasks)")
+                        //StatisticRow(title: "Completed Tasks", value: "\(dbTaskViewModel.completedTasks)")
+                        //StatisticRow(title: "Total Subtasks", value: "\(dbTaskViewModel.totalSubtasks)")
+                        //StatisticRow(title: "Completed Subtasks", value: "\(dbTaskViewModel.completedSubtasks)")
                     }
                     .padding(.horizontal, 16)
                     

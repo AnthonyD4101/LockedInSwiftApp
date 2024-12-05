@@ -77,14 +77,24 @@ struct SettingsView: View {
                         // Save Changes Button
                         Button(action: {
                             Task {
+                                infoChangeMessage = ""
+                                
                                 if !newEmail.isEmpty {
                                     await dbUserViewModel.updateEmail(newEmail: newEmail)
                                     infoChangeMessage += "Email updated successfully.\n"
+                                    newEmail = ""
                                 }
+                                
                                 if !newUsername.isEmpty {
                                     await dbUserViewModel.updateUsername(newUsername: newUsername)
                                     infoChangeMessage += "Username updated successfully."
+                                    newUsername = ""
                                 }
+                                
+                                if infoChangeMessage.isEmpty {
+                                    infoChangeMessage = "No changes were made."
+                                }
+                                
                                 showInfoChangeAlert = true
                             }
                         }) {
@@ -101,7 +111,7 @@ struct SettingsView: View {
                                 .cornerRadius(8)
                         }
                         .alert(isPresented: $showInfoChangeAlert) {
-                            Alert(title: Text("Changes Saved"), message: Text("Your email and username have been updated successfully."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Changes Saved"), message: Text(infoChangeMessage), dismissButton: .default(Text("OK")))
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -141,12 +151,46 @@ struct SettingsView: View {
                         // Change Password Button
                         Button(action: {
                             Task {
-                                if newPassword == confirmPassword {
-                                    await dbUserViewModel.updatePassword(newPassword: newPassword)
-                                    passwordChangeMessage = "Password updated successfully."
-                                } else {
-                                    passwordChangeMessage = "New password and confirmation do not match."
+                                passwordChangeMessage = ""
+
+                                guard !currentPassword.isEmpty else {
+                                    passwordChangeMessage = "Current password cannot be empty."
+                                    showPasswordChangeAlert = true
+                                    return
                                 }
+
+                                guard !newPassword.isEmpty && !confirmPassword.isEmpty else {
+                                    passwordChangeMessage = "New password and confirmation cannot be empty."
+                                    showPasswordChangeAlert = true
+                                    return
+                                }
+
+                                guard newPassword == confirmPassword else {
+                                    passwordChangeMessage = "New password and confirmation do not match."
+                                    showPasswordChangeAlert = true
+                                    return
+                                }
+
+                                if let userId = dbUserViewModel.currentUser?.id {
+                                    do {
+                                        // Call the updated `updatePassword` function with validation
+                                        try await dbUserViewModel.updatePassword(
+                                            currentPassword: currentPassword,
+                                            newPassword: newPassword,
+                                            userId: userId
+                                        )
+                                        passwordChangeMessage = "Password updated successfully."
+                                    } catch {
+                                        let nsError = error as NSError
+                                        if nsError.code == 2 {
+                                            passwordChangeMessage = "Current password is incorrect."
+                                        } else {
+                                            passwordChangeMessage = "An error occurred while updating the password. Please try again."
+                                        }
+                                    }
+                                }
+
+                                // Show the alert with the result
                                 showPasswordChangeAlert = true
                             }
                         }) {
@@ -164,7 +208,11 @@ struct SettingsView: View {
                         }
                         .padding(.top, 10)
                         .alert(isPresented: $showPasswordChangeAlert) {
-                            Alert(title: Text("Password Update"), message: Text(passwordChangeMessage), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Password Update"), message: Text(passwordChangeMessage), dismissButton: .default(Text("OK")){
+                                currentPassword = ""
+                                newPassword = ""
+                                confirmPassword = ""
+                            })
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -217,14 +265,24 @@ struct SettingsView: View {
                         // Save Changes Button
                         Button(action: {
                             Task {
+                                infoChangeMessage = ""
+                                
                                 if !newEmail.isEmpty {
                                     await dbUserViewModel.updateEmail(newEmail: newEmail)
                                     infoChangeMessage += "Email updated successfully.\n"
+                                    newEmail = ""
                                 }
+                                
                                 if !newUsername.isEmpty {
                                     await dbUserViewModel.updateUsername(newUsername: newUsername)
                                     infoChangeMessage += "Username updated successfully."
+                                    newUsername = ""
                                 }
+                                
+                                if infoChangeMessage.isEmpty {
+                                    infoChangeMessage = "No changes were made."
+                                }
+                                
                                 showInfoChangeAlert = true
                             }
                         }) {
@@ -241,7 +299,11 @@ struct SettingsView: View {
                                 .cornerRadius(8)
                         }
                         .alert(isPresented: $showInfoChangeAlert) {
-                            Alert(title: Text("Changes Saved"), message: Text("Your email and username have been updated successfully."), dismissButton: .default(Text("OK")))
+                            Alert(title: Text("Password Update"), message: Text(passwordChangeMessage), dismissButton: .default(Text("OK")){
+                                currentPassword = ""
+                                newPassword = ""
+                                confirmPassword = ""
+                            })
                         }
                         
                         // Change Password Section
@@ -279,12 +341,47 @@ struct SettingsView: View {
                         // Change Password Button
                         Button(action: {
                             Task {
-                                if newPassword == confirmPassword {
-                                    await dbUserViewModel.updatePassword(newPassword: newPassword)
-                                    passwordChangeMessage = "Password updated successfully."
-                                } else {
-                                    passwordChangeMessage = "New password and confirmation do not match."
+                                passwordChangeMessage = ""
+
+                                guard !currentPassword.isEmpty else {
+                                    passwordChangeMessage = "Current password cannot be empty."
+                                    showPasswordChangeAlert = true
+                                    return
                                 }
+
+                                guard !newPassword.isEmpty && !confirmPassword.isEmpty else {
+                                    passwordChangeMessage = "New password and confirmation cannot be empty."
+                                    showPasswordChangeAlert = true
+                                    return
+                                }
+
+                                guard newPassword == confirmPassword else {
+                                    passwordChangeMessage = "New password and confirmation do not match."
+                                    showPasswordChangeAlert = true
+                                    return
+                                }
+
+                                if let userId = dbUserViewModel.currentUser?.id {
+                                    do {
+                                        // Call the updated `updatePassword` function with validation
+                                        try await dbUserViewModel.updatePassword(
+                                            currentPassword: currentPassword,
+                                            newPassword: newPassword,
+                                            userId: userId
+                                        )
+                                        passwordChangeMessage = "Password updated successfully."
+                                    } catch {
+                                        let nsError = error as NSError
+                                        if nsError.code == 2 {
+                                            passwordChangeMessage = "Current password is incorrect."
+                                        } else {
+                                            passwordChangeMessage = "An error occurred while updating the password. Please try again."
+                                        }
+
+                                    }
+                                }
+
+                                // Show the alert with the result
                                 showPasswordChangeAlert = true
                             }
                         }) {

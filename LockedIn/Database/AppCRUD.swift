@@ -14,65 +14,67 @@ class DBUserViewModel: ObservableObject {
     @Published var currentUser: DBUser? = nil
     @Published var isAuthenticated = false
     private let db = Firestore.firestore()
-
+    
     func signUp(email: String, username: String, password: String) async -> Bool {
         do {
-            // Create user in FirebaseAuth
-            let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
-            let userId = authResult.user.uid
-
-            // Create user in Firestore
             let newUser = DBUser(email: email, username: username, password: password)
-            try await db.collection("users").document(userId).setData(from: newUser)
-
+            let documentRef = try await db.collection("users").addDocument(from: newUser)
+            
             DispatchQueue.main.async {
                 self.currentUser = newUser
+                self.currentUser?.id = documentRef.documentID
                 self.isAuthenticated = true
             }
-            return true
-        } catch let error as NSError {
-            print("Sign-up error: \(error.localizedDescription) (\(error.code))")
-            return false
-        }
-    }
-
-    func logIn(email: String, password: String) async -> Bool {
-        do {
-            // Log in with FirebaseAuth
-            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
-            let userId = authResult.user.uid
-
-            // Fetch user data from Firestore
-            let document = try await db.collection("users").document(userId).getDocument()
-            let fetchedUser = try document.data(as: DBUser.self)
-
-            DispatchQueue.main.async {
-                self.currentUser = fetchedUser
-                self.isAuthenticated = true
-            }
+            print("User signed up successfully.")
             return true
         } catch {
-            print("Error logging in: \(error.localizedDescription)")
+            print("Sign-up error: \(error.localizedDescription)")
             return false
         }
     }
-
+    
+    
+    func logIn(email: String, password: String) async -> Bool {
+        do {
+            let querySnapshot = try await db.collection("users")
+                .whereField("email", isEqualTo: email)
+                .whereField("password", isEqualTo: password)
+                .getDocuments()
+            
+            guard let document = querySnapshot.documents.first else {
+                print("Invalid email or password.")
+                return false
+            }
+            
+            let userData = try document.data(as: DBUser.self)
+            await refreshStatistics()
+            
+            DispatchQueue.main.async {
+                self.currentUser = userData
+                self.isAuthenticated = true
+            }
+            return true
+            
+        } catch {
+            print("Error during login: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
     func updateEmail(newEmail: String) async {
         guard let currentUser = currentUser, let userId = currentUser.id else { return }
         do {
-            // Update FirebaseAuth email
-            try await Auth.auth().currentUser?.updateEmail(to: newEmail)
-
-            // Update Firestore data
             try await db.collection("users").document(userId).updateData(["email": newEmail])
             DispatchQueue.main.async {
                 self.currentUser?.email = newEmail
             }
+            print("Email updated successfully in Firestore.")
         } catch {
             print("Error updating email: \(error.localizedDescription)")
         }
     }
-
+    
+    
     func updateUsername(newUsername: String) async {
         guard let userId = currentUser?.id else { return }
         do {
@@ -85,25 +87,66 @@ class DBUserViewModel: ObservableObject {
         }
     }
     
-    // TODO: Check if this works properly
-    func updatePassword(newPassword: String) async {
+    func updatePassword(currentPassword: String, newPassword: String, userId: String) async throws {
         do {
-            try await Auth.auth().currentUser?.updatePassword(to: newPassword)
+            // Fetch the current user document from Firestore
+            let userDocument = try await db.collection("users").document(userId).getDocument()
+            
+            guard let userData = userDocument.data(),
+                  let storedPassword = userData["password"] as? String else {
+                throw NSError(domain: "UpdatePassword", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch current password from database."])
+            }
+            
+            // Check if the current password matches the stored password
+            if currentPassword != storedPassword {
+                throw NSError(domain: "UpdatePassword", code: 2, userInfo: [NSLocalizedDescriptionKey: "Current password is incorrect."])
+            }
+            
+            // Update the password in Firestore
+            try await db.collection("users").document(userId).updateData(["password": newPassword])
+            
+            // Optionally update the local model
+            DispatchQueue.main.async {
+                self.currentUser?.password = newPassword
+            }
+            
+            print("Password updated successfully.")
         } catch {
             print("Error updating password: \(error.localizedDescription)")
+            throw error
         }
     }
-
-    func logOut() {
+    
+    func refreshStatistics() async {
+        guard let userId = currentUser?.id else { return }
         do {
-            try Auth.auth().signOut()
-            DispatchQueue.main.async {
-                self.currentUser = nil
-                self.isAuthenticated = false
+            let documentSnapshot = try await db.collection("users").document(userId).getDocument()
+            
+            if let data = documentSnapshot.data(),
+               let statisticsData = data["statistics"] as? [String: Any] {
+                let statistics = Statistics(
+                    totalTasks: statisticsData["totalTasks"] as? Int ?? 0,
+                    completedTasks: statisticsData["completedTasks"] as? Int ?? 0,
+                    totalSubtasks: statisticsData["totalSubtasks"] as? Int ?? 0,
+                    completedSubtasks: statisticsData["completedSubtasks"] as? Int ?? 0
+                )
+                
+                DispatchQueue.main.async {
+                    self.currentUser?.statistics = statistics
+                }
             }
         } catch {
-            print("Error logging out: \(error.localizedDescription)")
+            print("Error refreshing statistics: \(error.localizedDescription)")
         }
+    }
+    
+    func logOut() {
+        DispatchQueue.main.async {
+            self.currentUser = nil
+            self.isAuthenticated = false
+        }
+        
+        print("User logged out successfully.")
     }
 }
 
@@ -112,7 +155,8 @@ class DBUserViewModel: ObservableObject {
 class DBTaskViewModel: ObservableObject {
     @Published var tasks: [DBTask] = []
     private let db = Firestore.firestore()
-
+    
+    // MARK: - Task Management
     func fetchTasks(for userId: String) async {
         do {
             let querySnapshot = try await db.collection("users").document(userId).collection("tasks").getDocuments()
@@ -124,16 +168,20 @@ class DBTaskViewModel: ObservableObject {
             print("Error fetching tasks: \(error.localizedDescription)")
         }
     }
-
+    
     func addTask(for userId: String, task: DBTask) async {
         do {
             let _ = try await db.collection("users").document(userId).collection("tasks").addDocument(from: task)
+            await incrementStatistic(for: userId, field: "totalTasks", value: 1)
+            if let subtasks = task.subtasks {
+                await incrementStatistic(for: userId, field: "totalSubtasks", value: subtasks.count)
+            }
             await fetchTasks(for: userId)
         } catch {
             print("Error adding task: \(error.localizedDescription)")
         }
     }
-
+    
     func updateTask(for userId: String, task: DBTask) async {
         guard let taskId = task.id else { return }
         do {
@@ -143,58 +191,65 @@ class DBTaskViewModel: ObservableObject {
             print("Error updating task: \(error.localizedDescription)")
         }
     }
-
+    
     func removeTask(for userId: String, task: DBTask) async {
         guard let taskId = task.id else { return }
         do {
             try await db.collection("users").document(userId).collection("tasks").document(taskId).delete()
+            await decrementStatistic(for: userId, field: "totalTasks", value: 1)
+            await incrementStatistic(for: userId, field: "completedTasks", value: 1)
+            
+            if let subtasks = task.subtasks {
+                await decrementStatistic(for: userId, field: "totalSubtasks", value: subtasks.count)
+                let completedSubtasks = subtasks.filter { $0.isCompleted }.count
+                await incrementStatistic(for: userId, field: "completedSubtasks", value: completedSubtasks)
+            }
             await fetchTasks(for: userId)
         } catch {
             print("Error deleting task: \(error.localizedDescription)")
         }
     }
-
+    
     func addSubtask(to task: DBTask, subtask: DBSubtask, for userId: String) async {
         guard let taskId = task.id else { return }
         do {
             var updatedTask = task
             updatedTask.subtasks = (task.subtasks ?? []) + [subtask]
             try await db.collection("users").document(userId).collection("tasks").document(taskId).setData(from: updatedTask)
-            await fetchTasks(for: userId) // Refresh tasks
+            //await incrementStatistic(for: userId, field: "totalSubtasks", value: 1)
+            await fetchTasks(for: userId)
         } catch {
             print("Error adding subtask: \(error.localizedDescription)")
         }
     }
-
-    func removeSubtask(from task: DBTask, subtaskId: String, for userId: String) async {
-        guard let taskId = task.id else { return }
+    
+    // MARK: - Statistics Management
+    func incrementStatistic(for userId: String, field: String, value: Int) async {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userId)
+        
         do {
-            var updatedTask = task
-            updatedTask.subtasks = task.subtasks?.filter { $0.id != subtaskId }
-            try await db.collection("users").document(userId).collection("tasks").document(taskId).setData(from: updatedTask)
-            await fetchTasks(for: userId) // Refresh tasks
+            try await userRef.updateData([
+                "statistics.\(field)": FieldValue.increment(Int64(value))
+            ])
         } catch {
-            print("Error removing subtask: \(error.localizedDescription)")
+            print("Error incrementing statistic \(field): \(error.localizedDescription)")
         }
     }
-
-    // MARK: Computed Properties
-    var totalTasks: Int {
-        tasks.count
+    
+    func decrementStatistic(for userId: String, field: String, value: Int) async {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userId)
+        
+        do {
+            try await userRef.updateData([
+                "statistics.\(field)": FieldValue.increment(Int64(-value))
+            ])
+        } catch {
+            print("Error decrementing statistic \(field): \(error.localizedDescription)")
+        }
     }
-
-    var completedTasks: Int {
-        tasks.filter { $0.isCompleted }.count
-    }
-
-    var totalSubtasks: Int {
-        tasks.reduce(0) { $0 + ($1.subtasks?.count ?? 0) }
-    }
-
-    var completedSubtasks: Int {
-        tasks.reduce(0) { $0 + ($1.subtasks?.filter { $0.isCompleted }.count ?? 0) }
-    }
-
+    
     func tasksFor(date: Date) -> [DBTask] {
         let calendar = Calendar.current
         return tasks.filter { calendar.isDate($0.date, inSameDayAs: date) }
