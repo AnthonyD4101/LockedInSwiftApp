@@ -81,7 +81,7 @@ struct SignInView: View {
     var formView: some View {
         VStack(spacing: 8) {
             VStack(alignment: .leading) {
-                Text("Email/Username")
+                Text("Username")
                     .foregroundColor(.white)
                     .font(.system(size: 18))
                     .bold()
@@ -118,7 +118,7 @@ struct SignInView: View {
             }
             
             if loginFailed {
-                Text("Invalid username or password")
+                Text("Invalid email or password")
                     .foregroundColor(.red)
             }
             
