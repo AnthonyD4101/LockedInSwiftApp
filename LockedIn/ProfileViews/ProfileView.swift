@@ -129,6 +129,24 @@ struct ProfileView: View {
                     }
                     
                     Spacer()
+                    
+                    Button(action: {
+                        dbUserViewModel.logOut()
+                    }) {
+                        Text("Sign Out")
+                            .font(.system(size: 18))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                LinearGradient(gradient: Gradient(colors: [.red, .orange]),
+                                                                               startPoint: .leading, endPoint: .trailing)
+                            )
+                            .cornerRadius(8)
+                            .padding(.horizontal, 40)
+                    }
+                    .padding(.bottom, 20)
                 }
             }
         }

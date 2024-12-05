@@ -116,15 +116,12 @@ class DBUserViewModel: ObservableObject {
 
     // TODO: IMPLEMENT WAY TO LOG OUT
     func logOut() {
-        do {
-            try Auth.auth().signOut()
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
                 self.currentUser = nil
                 self.isAuthenticated = false
             }
-        } catch {
-            print("Error logging out: \(error.localizedDescription)")
-        }
+        
+        print("User logged out successfully.")
     }
 }
 
