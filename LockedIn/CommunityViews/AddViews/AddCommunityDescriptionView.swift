@@ -8,36 +8,62 @@
 import SwiftUI
 
 struct AddCommunityDescriptionView: View {
-    @Binding var community: Community
+    var communityId: String
+    @ObservedObject var dbCommunityViewModel: DBCommunityViewModel
     @Environment(\.dismiss) var dismiss
-    
+
     @State private var title: String = ""
     @State private var text: String = ""
-    
+    @State private var community: DBCommunity?
+
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Description Title")) {
-                    TextField("Enter description title", text: $title)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
+            if let community = community {
+                Form {
+                    Section(header: Text("Description Title")) {
+                        TextField("Enter description title", text: $title)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                    }
+
+                    Section(header: Text("Description Text")) {
+                        TextEditor(text: $text)
+                            .frame(height: 150)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                    }
                 }
-                
-                Section(header: Text("Description Text")) {
-                    TextEditor(text: $text)
-                        .frame(height: 150)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                }
+                .navigationBarTitle("Add Description", displayMode: .inline)
+                .navigationBarItems(
+                    leading: Button("Cancel") {
+                        dismiss()
+                    },
+                    trailing: Button("Add") {
+                        // Update community description and sync with Firestore
+                        var updatedCommunity = community
+                        updatedCommunity.description[title] = text
+                        Task {
+                            await dbCommunityViewModel.updateCommunity(community: updatedCommunity)
+                            dismiss()
+                        }
+                    }
+                    .disabled(title.isEmpty || text.isEmpty)
+                )
+            } else {
+                ProgressView("Loading Community...")
             }
-            .navigationBarTitle("Add Description", displayMode: .inline)
-            .navigationBarItems(leading: Button("Cancel") {
-                dismiss()
-            }, trailing: Button("Add") {
-                community.description[title] = text
-                dismiss()
-            }.disabled(title.isEmpty || text.isEmpty))
+        }
+        .onAppear {
+            loadCommunity()
+        }
+        .onDisappear(){
+            loadCommunity()
+        }
+    }
+
+    private func loadCommunity() {
+        Task {
+            self.community = await dbCommunityViewModel.getCommunity(byId: communityId)
         }
     }
 }
-

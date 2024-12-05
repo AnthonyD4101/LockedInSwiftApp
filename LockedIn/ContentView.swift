@@ -14,6 +14,7 @@ struct ContentView: View {
     
     @StateObject var dbUserViewModel = DBUserViewModel()
     @StateObject var dbTaskViewModel = DBTaskViewModel()
+    @StateObject var dbCommunityViewModel = DBCommunityViewModel()
     
     var body: some View {
         NavigationView {
@@ -35,7 +36,7 @@ struct ContentView: View {
                         }
                     
                     // TODO: Eventually Use DB Models Here
-                    CommunityView(taskViewModel: taskViewModel)
+                    CommunityView(dbCommunityViewModel: dbCommunityViewModel, dbTaskViewModel: dbTaskViewModel)
                         .tabItem {
                             Label("Community", systemImage: "person.3")
                         }

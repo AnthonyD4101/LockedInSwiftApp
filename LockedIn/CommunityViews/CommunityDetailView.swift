@@ -8,327 +8,321 @@
 import SwiftUI
 
 struct CommunityDetailView: View {
-    @Binding var community: Community
-    @Environment(\.dismiss) var dismiss
+    var communityId: String
+    @ObservedObject var dbCommunityViewModel: DBCommunityViewModel
+    @ObservedObject var dbTaskViewModel: DBTaskViewModel
     
-    @State private var showAddTaskView = false
+    @Environment(\.dismiss) var dismiss
+    @State private var selectedTab = 0
     @State private var showAddResourceView = false
     @State private var showAddDescriptionView = false
-    @State private var selectedTask: UserTask?
-    @State private var selectedTab = 0
-    
-    @ObservedObject var taskViewModel: TaskViewModel
+    @State private var showAddTaskView = false
+    @State private var community: DBCommunity?
     
     var body: some View {
-        ZStack {
-            Color.black
-                .edgesIgnoringSafeArea(.all)
-            
-            VStack(spacing: 16) {
-                HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Text("Back")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.vertical, 10)
-                            .padding(.horizontal, 20)
-                            .background(Color.black)
-                            .cornerRadius(10)
-                    }
-                    Spacer()
-                }
+        VStack(spacing: 16) {
+            if let community = community {
+                // Header
+                CommunityHeaderView(communityName: community.name, dismissAction: { dismiss() })
                 
-                HStack {
-                    Text(community.name)
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.leading)
-                    
-                    Spacer()
-                }
+                // Tab Navigation
+                CommunityTabNavigationView(selectedTab: $selectedTab)
                 
-                Divider()
-                    .background(Color.white)
-                
-                
-                HStack {
-                    if selectedTab > 0 {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                            Text("Previous")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .frame(width: 100, alignment: .leading)
-                    } else {
-                        Spacer().frame(width: 100)
-                    }
-                    
-                    Spacer()
-                    
-                    Text(selectedTab == 0 ? "Tasks" : selectedTab == 1 ? "Resources" : "About")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    Spacer()
-                    
-                    if selectedTab < 2 {
-                        HStack {
-                            Text("Next")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .frame(width: 100, alignment: .trailing)
-                    } else {
-                        Spacer().frame(width: 100)
-                    }
-                }
-                
+                // Tab Content
                 TabView(selection: $selectedTab) {
-                    
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            if community.tasks.isEmpty {
-                                Text("No tasks available")
-                                    .font(.headline)
-                                    .foregroundColor(.gray)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            } else {
-                                ForEach($community.tasks) { $task in
-                                    Button(action: {
-                                        selectedTask = task
-                                    }) {
-                                        OLDTaskRowView(task: $task, onComplete: {})
-                                            .padding(.horizontal)
-                                            .cornerRadius(10)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.leading)
-                    }.tag(0)
-                    
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            if community.resources.isEmpty {
-                                Text("No resources available")
-                                    .font(.headline)
-                                    .foregroundColor(.gray)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            } else {
-                                ForEach(community.resources) { resource in
-                                    Link(destination: URL(string: resource.url)!) {
-                                        Text(resource.title)
-                                            .font(.headline)
-                                            .foregroundColor(.blue)
-                                            .underline()
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-                        }
-                        .padding(.leading)
-                    }.tag(1)
-                    
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 10) {
-                            if community.description.isEmpty {
-                                Text("No information available")
-                                    .font(.headline)
-                                    .foregroundColor(.gray)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            }
-                            else {
-                                ForEach(community.description.keys.sorted(), id: \.self) { title in
-                                    Text(title)
-                                        .font(.headline)
-                                        .foregroundColor(.cyan)
-                                    
-                                    Text(community.description[title] ?? "")
-                                        .foregroundColor(.white)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }.tag(2)
-                    
+                    TasksTabView(tasks: community.tasks ?? [])
+                        .tag(0)
+                    ResourcesTabView(resources: community.resources ?? [])
+                        .tag(1)
+                    AboutTabView(description: community.description)
+                        .tag(2)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                
-                Spacer()
-                
-                Button(action: {
-                    if selectedTab == 0 {
-                        showAddTaskView.toggle()
-                    } else if (selectedTab == 1) {
-                        showAddResourceView.toggle()
-                    } else if (selectedTab == 2) {
-                        showAddDescriptionView.toggle()
-                    }
-                }) {
-                    Image(systemName: "plus")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient(gradient: Gradient(colors: [.cyan, .blue]),
-                                                   startPoint: .leading,
-                                                   endPoint: .trailing))
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
-                }
-                .frame(width: 60, height: 60)
                 .padding()
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .sheet(isPresented: $showAddTaskView) {
-                AddCommunityTaskView(community: $community)
-            }
-            .sheet(isPresented: $showAddResourceView) {
-                AddCommunityResourceView(community: $community)
-            }
-            .sheet(isPresented: $showAddDescriptionView) {
-                AddCommunityDescriptionView(community: $community)
-            }
-            .sheet(item: $selectedTask) { selectedTask in
-                if let index = taskViewModel.tasks.firstIndex(where: { $0.id == selectedTask.id }) {
-                    OLDTaskDetailsView(task: $taskViewModel.tasks[index])
+                
+                // Add Buttons
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        handleAddButton()
+                    }) {
+                        CircleButtonView(icon: "plus", gradient: Gradient(colors: [.blue, .cyan]))
+                    }
                 }
+                .padding()
+            } else {
+                Text("Loading community...")
+                    .font(.headline)
+                    .foregroundColor(.gray)
             }
+        }
+        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            loadCommunity()
+        }
+        .sheet(isPresented: $showAddTaskView) {
+            if let community = community {
+                AddCommunityTaskView(communityId: communityId, dbCommunityViewModel: dbCommunityViewModel)
+            }
+        }
+        .sheet(isPresented: $showAddResourceView) {
+            if let community = community {
+                AddCommunityResourceView(communityId: communityId, dbCommunityViewModel: dbCommunityViewModel)
+            }
+        }
+        .sheet(isPresented: $showAddDescriptionView) {
+            if let community = community {
+                AddCommunityDescriptionView(communityId: communityId, dbCommunityViewModel: dbCommunityViewModel)
+            }
+        }
+    }
+    
+    private func handleAddButton() {
+        if selectedTab == 0 {
+            showAddTaskView = true
+        } else if selectedTab == 1 {
+            showAddResourceView = true
+        } else {
+            showAddDescriptionView = true
+        }
+    }
+    
+    private func loadCommunity() {
+        Task {
+            self.community = await dbCommunityViewModel.getCommunity(byId: communityId)
         }
     }
 }
 
-// FOR TESTING ONLY, CHANGE LATER
-struct OLDTaskDetailsView: View {
-    @Binding var task: UserTask
-    @State private var subtasks: [Subtask]
-    
-    init(task: Binding<UserTask>) {
-        self._task = task
-        self._subtasks = State(initialValue: task.wrappedValue.subtasks)
-    }
+struct CommunityHeaderView: View {
+    var communityName: String
+    var dismissAction: () -> Void
     
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading, spacing: 16) {
-                TaskNameView(name: task.name)
-                TaskDescriptionView(description: task.description)
-                TaskDueDateView(date: task.date)
-                
-                Divider()
-                    .background(Color.white)
+        HStack {
+            Button(action: dismissAction) {
+                Text("Back")
+                    .font(.headline)
+                    .foregroundColor(.white)
                     .padding(.horizontal)
-                
-                OLDSubtasksListView(subtasks: $subtasks)
-                
-                if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
-                    HStack {
-                        Spacer()
-                        CompleteTaskMarker {
-                            print("Task completed!")
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 10)
-                }
-                
-                Spacer()
             }
-            .padding(.top)
-            .background(Color.black.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Task Details")
-            .navigationBarTitleDisplayMode(.inline)
-            .onDisappear {
-                task.subtasks = subtasks
+            
+            Spacer()
+            
+            Text(communityName)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct CommunityTabNavigationView: View {
+    @Binding var selectedTab: Int
+    
+    var body: some View {
+        HStack {
+            ForEach(0..<3) { index in
+                Text(tabTitle(for: index))
+                    .font(.headline)
+                    .foregroundColor(selectedTab == index ? .white : .gray)
+                    .padding()
+                    .onTapGesture { selectedTab = index }
+            }
+        }
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(10)
+        .padding()
+    }
+    
+    private func tabTitle(for index: Int) -> String {
+        switch index {
+        case 0: return "Tasks"
+        case 1: return "Resources"
+        case 2: return "About"
+        default: return ""
+        }
+    }
+}
+
+struct TasksTabView: View {
+    var tasks: [DBTask]
+    
+    var body: some View {
+        ScrollView {
+            if tasks.isEmpty {
+                Text("No tasks available")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(tasks, id: \.self) { task in
+                    CommunityTaskRowView(task: task) {
+                        print("\(task.name) completed!") // Handle task completion
+                    }
+                    
+                    Divider().background(Color.white)
+
+                }
+            }
+        }
+        .navigationTitle("Tasks")
+    }
+}
+
+struct ResourcesTabView: View {
+    var resources: [DBResource]
+    
+    var body: some View {
+        ScrollView {
+            if resources.isEmpty {
+                Text("No resources available")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(resources, id: \.self) { resource in
+                    if let url = normalizeURL(resource.url), UIApplication.shared.canOpenURL(url) {
+                        Link(resource.title, destination: url)
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                    } else {
+                        Text("\(resource.title) (Invalid URL)")
+                            .font(.headline)
+                            .foregroundColor(.red)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                    }
+                }
+            }
+        }
+    }
+    
+    func normalizeURL(_ urlString: String) -> URL? {
+        // Ensure URL has a scheme (e.g., "http://", "https://")
+        if let url = URL(string: urlString), url.scheme != nil {
+            return url
+        } else {
+            return URL(string: "https://\(urlString)")
+        }
+    }
+}
+
+struct AboutTabView: View {
+    var description: [String: String]
+    
+    var body: some View {
+        ScrollView {
+            if description.isEmpty {
+                Text("No description available")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(description.keys.sorted(), id: \.self) { key in
+                    VStack(alignment: .leading) {
+                        Text(key)
+                            .font(.headline)
+                            .foregroundColor(.cyan)
+                        
+                        Text(description[key] ?? "")
+                            .foregroundColor(.white)
+                            .padding(.bottom)
+                    }
+                }
             }
         }
     }
 }
 
-// FOR TESTING ONLY, CHANGE LATER
-struct OLDTaskRowView: View {
-    @Binding var task: UserTask
+struct CircleButtonView: View {
+    var icon: String
+    var gradient: Gradient
+    
+    var body: some View {
+        Image(systemName: icon)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 25, height: 25)
+            .foregroundColor(.white)
+            .padding()
+            .background(LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing))
+            .clipShape(Circle())
+            .shadow(radius: 5)
+    }
+}
+
+struct CommunityTaskRowView: View {
+    var task: DBTask
     var onComplete: () -> Void
     
     var body: some View {
-        HStack(alignment: .top) {
-            Button(action: {
-                withAnimation {
-                    task.isCompleted.toggle()
-                    if task.isCompleted {
-                        onComplete()
-                    }
+        NavigationLink(destination: TaskDetailView(task: task)) {
+            HStack(alignment: .top) {
+                Button(action: {
+                }) {
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(task.isCompleted ? .red : .white)
+                        .font(.system(size: 20))
                 }
-            }) {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(task.isCompleted ? .red : .white)
-                    .font(.system(size: 20))
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text(task.name)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
                 
-                if !task.description.isEmpty {
-                    Text(task.description)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(task.name)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    
+                    Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.red)
                 }
                 
-                Text("Due Date: \(DateFormatter.localizedString(from: task.date, dateStyle: .medium, timeStyle: .none))")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.red)
+                Spacer()
+            }
+            .background(task.isCompleted ? Color.black.opacity(0.3) : Color.clear)
+            .cornerRadius(10)
+        }
+    }
+}
+
+struct TaskDetailView: View {
+    var task: DBTask
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Subtasks for \(task.name)")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .padding()
+            
+            if let subtasks = task.subtasks, !subtasks.isEmpty {
+                ForEach(subtasks) { subtask in
+                    HStack {
+                        Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(subtask.isCompleted ? .green : .gray)
+                        Text(subtask.name)
+                            .font(.headline)
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                }
+            } else {
+                Text("No subtasks available")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                    .padding()
             }
             
             Spacer()
         }
-        .background(task.isCompleted ? Color.black.opacity(0.3) : Color.clear)
-        .cornerRadius(10)
-    }
-}
-
-// FOR TESTING ONLY, CHANGE LATER
-struct OLDSubtasksListView: View {
-    @Binding var subtasks: [Subtask]
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Sub-tasks (\(subtasks.filter { $0.isCompleted }.count)/\(subtasks.count))")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal)
-            
-            ForEach($subtasks) { $subtask in
-                HStack {
-                    Button(action: {
-                        subtask.isCompleted.toggle()
-                    }) {
-                        Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(.white)
-                    }
-                    
-                    Text(subtask.name)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    Spacer()
-                }
-                .padding()
-            }
-        }
+        .padding()
+        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .foregroundColor(.white)
     }
 }

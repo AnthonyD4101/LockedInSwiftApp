@@ -200,3 +200,68 @@ class DBTaskViewModel: ObservableObject {
         return tasks.filter { calendar.isDate($0.date, inSameDayAs: date) }
     }
 }
+
+// MARK: Community View Model
+class DBCommunityViewModel: ObservableObject {
+    @Published var communities: [DBCommunity] = []
+    private let db = Firestore.firestore()
+    
+    // Fetch all communities
+    func fetchCommunities() async {
+        do {
+            let querySnapshot = try await db.collection("communities").getDocuments()
+            let fetchedCommunities = querySnapshot.documents.compactMap { try? $0.data(as: DBCommunity.self) }
+            DispatchQueue.main.async {
+                self.communities = fetchedCommunities
+            }
+        } catch {
+            print("Error fetching communities: \(error.localizedDescription)")
+        }
+    }
+    
+    // Add a new community
+    func addCommunity(community: DBCommunity) async {
+        do {
+            let _ = try await db.collection("communities").addDocument(from: community)
+            await fetchCommunities()
+        } catch {
+            print("Error adding community: \(error.localizedDescription)")
+        }
+    }
+    
+    // Update an existing community
+    func updateCommunity(community: DBCommunity) async -> Bool {
+        guard let communityId = community.id else { return false }
+        do {
+            try await db.collection("communities").document(communityId).setData(from: community)
+            await fetchCommunities() // Refresh local data
+            return true
+        } catch {
+            print("Failed to update community: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    func getCommunity(byId id: String) async -> DBCommunity? {
+            do {
+                let document = try await db.collection("communities").document(id).getDocument()
+                return try document.data(as: DBCommunity.self)
+            } catch {
+                print("Error fetching community: \(error.localizedDescription)")
+                return nil
+            }
+        }
+
+        func addTaskToCommunity(_ task: DBTask, toCommunityId communityId: String) async -> Bool {
+            do {
+                var community = await getCommunity(byId: communityId)
+                community?.tasks?.append(task)
+                guard let updatedCommunity = community else { return false }
+                try await db.collection("communities").document(communityId).setData(from: updatedCommunity)
+                return true
+            } catch {
+                print("Error adding task to community: \(error.localizedDescription)")
+                return false
+            }
+        }
+}
