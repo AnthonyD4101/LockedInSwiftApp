@@ -53,6 +53,8 @@ struct DBResource: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
     var title: String
     var url: String
+}
+
 struct Statistics: Codable {
     var totalTasks: Int
     var completedTasks: Int
@@ -66,3 +68,4 @@ struct Statistics: Codable {
         self.completedSubtasks = completedSubtasks
     }
 }
+

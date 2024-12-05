@@ -52,25 +52,6 @@ struct ProfileView: View {
                             }
                             .padding(.top, 40)
                             
-                            Spacer()
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        // Right Side: Embedded Statistics
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("App Statistics")
-                                .font(.system(size: 20))
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding(.top, 24)
-                            
-                            StatisticRow(title: "Total Tasks", value: "\(dbUserViewModel.currentUser?.statistics.totalTasks ?? 0)")
-                            StatisticRow(title: "Completed Tasks", value: "\(dbUserViewModel.currentUser?.statistics.completedTasks ?? 0)")
-                            StatisticRow(title: "Total Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.totalSubtasks ?? 0)")
-                            StatisticRow(title: "Completed Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.completedSubtasks ?? 0)")
-                            
-                            Spacer()
-                                .frame(height: 50)
                             
                             HStack(spacing: 16) {
                                 NavigationLink(destination: SettingsView()
@@ -117,7 +98,27 @@ struct ProfileView: View {
                                 }
                             }
                             .padding(.bottom, 20)
+
                         }
+                        .frame(maxWidth: .infinity)
+                        
+                        // Right Side: Embedded Statistics
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("App Statistics")
+                                .font(.system(size: 20))
+                                .bold()
+                                .foregroundColor(.white)
+                                .padding(.top, 24)
+                            
+                            StatisticRow(title: "Total Tasks", value: "\(dbUserViewModel.currentUser?.statistics.totalTasks ?? 0)")
+                            StatisticRow(title: "Completed Tasks", value: "\(dbUserViewModel.currentUser?.statistics.completedTasks ?? 0)")
+                            StatisticRow(title: "Total Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.totalSubtasks ?? 0)")
+                            StatisticRow(title: "Completed Subtasks", value: "\(dbUserViewModel.currentUser?.statistics.completedSubtasks ?? 0)")
+                            
+                            Spacer()
+                                .frame(height: 50)
+                            
+                                                    }
                         .frame(maxWidth: .infinity)
                     }
                 } else {

@@ -16,52 +16,46 @@ struct AddCommunityView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 16) {
-                TextField("Community Name", text: $communityName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
+            Form {
+                Section(header: Text("Community Details")) {
+                    TextField("Community Name", text: $communityName)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
 
-                TextField("Image Name (optional)", text: $communityImage)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-
-                Spacer()
-
-                Button(action: {
-                    Task {
-                        let newCommunity = DBCommunity(
-                            name: communityName,
-                            imageName: communityImage.isEmpty ? "swift" : communityImage,
-                            tasks: [],
-                            resources: [],
-                            isFavorite: false,
-                            description: [:]
-                        )
-                        await dbCommunityViewModel.addCommunity(community: newCommunity)
-                        
-                        await dbCommunityViewModel.fetchCommunities()
-                        
+                    TextField("Image Name (optional)", text: $communityImage)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                }
+            }
+            .navigationTitle("Add Community")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
                         dismiss()
                     }
-                }) {
-                    Text("Create Community")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(10)
                 }
-                .padding()
-                .disabled(communityName.isEmpty)
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Create") {
+                        Task {
+                            let newCommunity = DBCommunity(
+                                name: communityName,
+                                imageName: communityImage.isEmpty ? "swift" : communityImage,
+                                tasks: [],
+                                resources: [],
+                                isFavorite: false,
+                                description: [:]
+                            )
+                            await dbCommunityViewModel.addCommunity(community: newCommunity)
+
+                            await dbCommunityViewModel.fetchCommunities()
+
+                            dismiss()
+                        }
+                    }
+                    .disabled(communityName.isEmpty) // Disable if the name is empty
+                }
             }
-            .padding()
-            .navigationTitle("Add Community")
-            .navigationBarItems(leading: Button("Cancel") { dismiss() })
         }
     }
 }
