@@ -149,12 +149,12 @@ struct CommunityView: View {
     
     var body: some View {
         let orientation = DeviceOrientation(
-                    widthSizeClass: widthSizeClass,
-                    heightSizeClass: heightSizeClass
-                )
+            widthSizeClass: widthSizeClass,
+            heightSizeClass: heightSizeClass
+        )
         
         let isLandscape = orientation.isLandscape(device: .iPhonePlusOrMax) || orientation.isLandscape(device: .iPhone) || orientation.isLandscape(device: .iPadFull)
-
+        
         ZStack {
             Color.black
                 .edgesIgnoringSafeArea(.all)
@@ -273,7 +273,9 @@ struct CommunityView: View {
                 .sheet(isPresented: $showAddCommunityView) {
                     AddCommunityView(communities: $communities)
                 }
-                .padding(.bottom, isLandscape ? 130 : 0)
+                .padding(25)
+                .padding(.bottom, isLandscape ? 150 : 0)
+                
             }
             .padding()
             .fullScreenCover(item: $selectedCommunity) { community in

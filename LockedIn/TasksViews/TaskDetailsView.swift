@@ -10,12 +10,13 @@ import SwiftUI
 // MARK: - Task Details View
 struct TaskDetailsView: View {
     @ObservedObject var dbTaskViewModel: DBTaskViewModel
+    @Environment(\.dismiss) private var dismiss // Used to dismiss the view
+
     var userId: String
     
     @Binding var task: DBTask
     @State private var subtasks: [DBSubtask] = []
-    //@State private var isLoading = true
-    
+
     init(task: Binding<DBTask>, dbTaskViewModel: DBTaskViewModel, userId: String) {
         self._task = task
         self.dbTaskViewModel = dbTaskViewModel
@@ -44,7 +45,7 @@ struct TaskDetailsView: View {
                 if subtasks.allSatisfy({ $0.isCompleted }) && !subtasks.isEmpty {
                     HStack {
                         Spacer()
-                        CompleteTaskButton {
+                        CompleteTaskMarker {
                             markTaskAsCompleted()
                         }
                         Spacer()
@@ -58,6 +59,15 @@ struct TaskDetailsView: View {
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // Add the Done button to the top-right corner
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(.white) // Optional: Customize the color
+                }
+            }
             .onAppear {
                 loadSubtasks()
             }
@@ -180,18 +190,16 @@ struct SubtasksListView: View {
 }
 
 // MARK: - Complete Task Button
-struct CompleteTaskButton: View {
+struct CompleteTaskMarker: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
-            Text("All Subtasks Completed!")
-                .font(.system(size: 18, weight: .bold))
-                .padding(.vertical, 8)
-                .padding(.horizontal, 20)
-                .background(Color.green)
-                .foregroundColor(.black)
-                .cornerRadius(20)
-        }
+        Text("All Subtasks Completed!")
+            .font(.system(size: 18, weight: .bold))
+            .padding(.vertical, 8)
+            .padding(.horizontal, 20)
+            .background(Color.green)
+            .foregroundColor(.black)
+            .cornerRadius(20)
     }
 }
