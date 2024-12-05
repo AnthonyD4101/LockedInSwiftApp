@@ -81,7 +81,7 @@ struct SignInView: View {
     var formView: some View {
         VStack(spacing: 8) {
             VStack(alignment: .leading) {
-                Text("Username")
+                Text("Email")
                     .foregroundColor(.white)
                     .font(.system(size: 18))
                     .bold()

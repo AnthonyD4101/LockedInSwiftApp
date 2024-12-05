@@ -17,42 +17,43 @@ class DBUserViewModel: ObservableObject {
 
     func signUp(email: String, username: String, password: String) async -> Bool {
         do {
-            // Create user in FirebaseAuth
-            let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
-            let userId = authResult.user.uid
-
-            // Create user in Firestore
             let newUser = DBUser(email: email, username: username, password: password)
-            try await db.collection("users").document(userId).setData(from: newUser)
-
+            let documentRef = try await db.collection("users").addDocument(from: newUser)
+            
             DispatchQueue.main.async {
                 self.currentUser = newUser
+                self.currentUser?.id = documentRef.documentID
                 self.isAuthenticated = true
             }
+            print("User signed up successfully.")
             return true
-        } catch let error as NSError {
-            print("Sign-up error: \(error.localizedDescription) (\(error.code))")
+        } catch {
+            print("Sign-up error: \(error.localizedDescription)")
             return false
         }
     }
 
+
     func logIn(email: String, password: String) async -> Bool {
         do {
-            // Log in with FirebaseAuth
-            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
-            let userId = authResult.user.uid
+            let querySnapshot = try await db.collection("users")
+                .whereField("email", isEqualTo: email)
+                .whereField("password", isEqualTo: password)
+                .getDocuments()
 
-            // Fetch user data from Firestore
-            let document = try await db.collection("users").document(userId).getDocument()
-            let fetchedUser = try document.data(as: DBUser.self)
+            guard let document = querySnapshot.documents.first else {
+                print("Invalid email or password.")
+                return false
+            }
 
+            let userData = try document.data(as: DBUser.self)
             DispatchQueue.main.async {
-                self.currentUser = fetchedUser
+                self.currentUser = userData
                 self.isAuthenticated = true
             }
             return true
         } catch {
-            print("Error logging in: \(error.localizedDescription)")
+            print("Error during login: \(error.localizedDescription)")
             return false
         }
     }
@@ -60,18 +61,16 @@ class DBUserViewModel: ObservableObject {
     func updateEmail(newEmail: String) async {
         guard let currentUser = currentUser, let userId = currentUser.id else { return }
         do {
-            // Update FirebaseAuth email
-            try await Auth.auth().currentUser?.updateEmail(to: newEmail)
-
-            // Update Firestore data
             try await db.collection("users").document(userId).updateData(["email": newEmail])
             DispatchQueue.main.async {
                 self.currentUser?.email = newEmail
             }
+            print("Email updated successfully in Firestore.")
         } catch {
             print("Error updating email: \(error.localizedDescription)")
         }
     }
+
 
     func updateUsername(newUsername: String) async {
         guard let userId = currentUser?.id else { return }
@@ -85,10 +84,15 @@ class DBUserViewModel: ObservableObject {
         }
     }
     
-    // TODO: Check if this works properly
     func updatePassword(newPassword: String) async {
+        guard let currentUser = currentUser, let userId = currentUser.id else { return }
         do {
-            try await Auth.auth().currentUser?.updatePassword(to: newPassword)
+            // Update Firestore data
+            try await db.collection("users").document(userId).updateData(["password": newPassword])
+            DispatchQueue.main.async {
+                self.currentUser?.password = newPassword
+            }
+            print("Password updated successfully in Firestore.")
         } catch {
             print("Error updating password: \(error.localizedDescription)")
         }
